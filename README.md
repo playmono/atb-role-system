@@ -1,5 +1,5 @@
 ### Decentralized chess
-An platform to play chess online and save the games on the blockchain.
+A platform to play chess online and save the games on the blockchain.
 
 ## Thanks to
 1. [Universitat Oberta de Catalunya](https://www.uoc.edu)
