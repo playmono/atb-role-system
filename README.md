@@ -1,5 +1,4 @@
-### Decentralized chess
-A platform to play chess online and save the games on the blockchain.
+### Active Time Battle Role System
 
 ## Thanks to
 1. [Universitat Oberta de Catalunya](https://www.uoc.edu)
