@@ -1,26 +1,28 @@
-import { EffectRange } from "../Enums";
-import { Role } from "../Role";
-import { Blessing } from "../Skills/Blessing";
-import { Cure } from "../Skills/Cure";
-import { Heal } from "../Skills/Heal";
-import { Ragnarok } from "../Skills/Ragnarok";
-import { Resurrection } from "../Skills/Resurrection";
-import { Sanctuary } from "../Skills/Sanctuary";
+import { EffectRange, RoleNames } from "../Enums";
+import Role from "../Role";
+import Blessing from "../Skills/Blessing";
+import Cure from "../Skills/Cure";
+import Heal from "../Skills/Heal";
+import Ragnarok from "../Skills/Ragnarok";
+import Resurrection from "../Skills/Resurrection";
+import Sanctuary from "../Skills/Sanctuary";
 
-export class WhiteMage extends Role {
-    healthMultiplier: 3;
-    physicalAttackMultiplier: 4;
-    magicalAttackMultiplier: 2;
-    physicalDefenseMultiplier: 1;
-    magicalDefenseMultiplier: 1;
-    effectRange: EffectRange.One;
+export default class WhiteMage implements Role {
+    readonly roleName = RoleNames.WHITE_MAGE;
+    readonly positionInSpreadsheet = 5;
+    readonly healthMultiplier = 3;
+    readonly physicalAttackMultiplier = 4;
+    readonly magicalAttackMultiplier = 2;
+    readonly physicalDefenseMultiplier = 1;
+    readonly magicalDefenseMultiplier = 1;
+    readonly effectRange = EffectRange.One;
 
-    skills: [
-        [Heal, 2],
-        [Cure, 5],
-        [Blessing, 10],
-        [Resurrection, 15],
-        [Sanctuary, 20],
-        [Ragnarok, 30]
+    readonly skills: [number, string][] = [
+        [2, Heal.name],
+        [5, Cure.name],
+        [10, Blessing.name],
+        [15, Resurrection.name],
+        [20, Sanctuary.name],
+        [30, Ragnarok.name]
     ];
 }

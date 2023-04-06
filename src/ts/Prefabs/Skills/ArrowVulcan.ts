@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class ArrowVulcan extends Skill {
-    range: EffectRange.Two;
-    damageType: DamageType.Physical;
-    areaOfEffect: AreaOfEffect.Group;
+export default class ArrowVulcan implements Skill {
+    readonly effectRange = EffectRange.Two;
+    readonly damageType = DamageType.Physical;
+    readonly areaOfEffect = AreaOfEffect.Group;
 }

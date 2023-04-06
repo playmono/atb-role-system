@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class Bash extends Skill {
-    effectRange: EffectRange.One;
-    damageType: DamageType.Physical;
-    areaOfEffect: AreaOfEffect.Single;
+export default class Bash implements Skill {
+    readonly effectRange = EffectRange.One;
+    readonly damageType = DamageType.Physical;
+    readonly areaOfEffect = AreaOfEffect.Single;
 }

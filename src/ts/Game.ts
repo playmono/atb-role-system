@@ -4,12 +4,12 @@ import Preloader from "./Scenes/Preloader";
 import MainMenu from "./Scenes/MainMenu";
 import SplashScreen from "./Scenes/SplashScreen";
 import Utilities from "./Utilities";
-import MainGame from "./Scenes/MainGame";
+import Battlefield from "./Scenes/Battlefied";
 import MainSettings from "./Scenes/MainSettings";
 
 const gameConfig: Phaser.Types.Core.GameConfig = {
-	width: 800,
-	height: 600,
+	width: 360,
+	height: 640,
 	type: Phaser.AUTO,
 	parent: "content",
 	title: "Starter Project for Phaser 3 with Visual Studio Code, TypeScript, and NodeJS"
@@ -25,7 +25,7 @@ export default class Game extends Phaser.Game {
 		this.scene.add(Preloader.Name, Preloader);
 		this.scene.add(SplashScreen.Name, SplashScreen);
 		this.scene.add(MainMenu.Name, MainMenu);
-		this.scene.add(MainGame.Name, MainGame);
+		this.scene.add(Battlefield.Name, Battlefield);
 		this.scene.add(MainSettings.Name, MainSettings);
 		this.scene.start(Boot.Name);
 	}
@@ -54,6 +54,6 @@ window.onload = (): void => {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const game = new Game(gameConfig);
 	// Uncomment the following two lines if you want the game to scale to fill the entire page, but keep the game ratio.
-	//resize();
-	//window.addEventListener("resize", resize, true);
+	resize();
+	window.addEventListener("resize", resize, true);
 };

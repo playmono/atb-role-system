@@ -16,3 +16,28 @@ export enum DamageType {
     Magical,
     None
 }
+
+export enum RoleNames {
+    ARCHER,
+    BLACKMAGE,
+    NOVICE,
+    WARRIOR,
+    WHITE_MAGE
+};
+
+export enum LanePosition {
+    FORWARD,
+    BACKWARD
+};
+
+export enum Rows {
+    FIRST_ROW = 0,
+    SECOND_ROW = 1,
+};
+
+export enum Columns {
+    FIRST_COLUMN = 0,
+    SECOND_COLUMN = 1,
+    THIRD_COLUMN = 2,
+    FOURTH_COLUMN = 3,
+};

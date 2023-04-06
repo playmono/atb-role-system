@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class MedusaGlance extends Skill {
-    effectRange: EffectRange.Two;
-    damageType: DamageType.None;
-    areaOfEffect: AreaOfEffect.Group;
+export default class MedusaGlance implements Skill {
+    readonly effectRange = EffectRange.Two;
+    readonly damageType = DamageType.None;
+    readonly areaOfEffect = AreaOfEffect.Group;
 }

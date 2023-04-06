@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class MagnumBreak extends Skill {
-    effectRange: EffectRange.One;
-    damageType: DamageType.None;
-    areaOfEffect: AreaOfEffect.Row;
+export default class MagnumBreak implements Skill {
+    readonly effectRange = EffectRange.One;
+    readonly damageType = DamageType.None;
+    readonly areaOfEffect = AreaOfEffect.Row;
 }

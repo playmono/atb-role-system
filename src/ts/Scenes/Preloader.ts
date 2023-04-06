@@ -18,6 +18,8 @@ export default class Preloader extends Phaser.Scene {
 		for (let i = 0; i < 100; i++) {
 			this.load.image("Phaser-Logo-Small" + i, "Phaser-Logo-Small.png");
 		}
+
+		this.load.spritesheet('tileset', 'tileset.png', { frameWidth: 32, frameHeight: 32});
 	}
 
 	public create(): void {

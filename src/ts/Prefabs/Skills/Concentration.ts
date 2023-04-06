@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class Concentration extends Skill {
-    effectRange: EffectRange.Self;
-    damageType: DamageType.None;
-    areaOfEffect: AreaOfEffect.Single;
+export default class Concentration implements Skill {
+    readonly effectRange = EffectRange.Self;
+    readonly damageType = DamageType.None;
+    readonly areaOfEffect = AreaOfEffect.Single;
 }

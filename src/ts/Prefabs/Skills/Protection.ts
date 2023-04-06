@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class Protection extends Skill {
-    effectRange: EffectRange.One;
-    damageType: DamageType.None;
-    areaOfEffect: AreaOfEffect.Single;
+export default class Protection implements Skill {
+    readonly effectRange = EffectRange.One;
+    readonly damageType = DamageType.None;
+    readonly areaOfEffect = AreaOfEffect.Single;
 }

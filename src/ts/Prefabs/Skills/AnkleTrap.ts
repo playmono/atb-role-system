@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class AnkleTrap extends Skill {
-    effectRange: EffectRange.Two;
-    damageType: DamageType.None;
-    areaOfEffect: AreaOfEffect.Single;
+export default class AnkleTrap implements Skill {
+    readonly effectRange = EffectRange.Two;
+    readonly damageType = DamageType.None;
+    readonly areaOfEffect = AreaOfEffect.Single;
 }

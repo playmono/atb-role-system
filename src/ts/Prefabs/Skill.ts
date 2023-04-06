@@ -1,7 +1,7 @@
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 
-export abstract class Skill {
-    abstract effectRange: EffectRange;
-    abstract damageType: DamageType;
-    abstract areaOfEffect: AreaOfEffect;
+export default interface Skill {
+    effectRange: EffectRange;
+    damageType: DamageType;
+    areaOfEffect: AreaOfEffect;
 }

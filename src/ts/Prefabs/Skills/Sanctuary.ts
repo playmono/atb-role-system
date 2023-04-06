@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class Sanctuary extends Skill {
-    effectRange: EffectRange.One;
-    damageType: DamageType.None;
-    areaOfEffect: AreaOfEffect.Group;
+export default class Sanctuary implements Skill {
+    readonly effectRange = EffectRange.One;
+    readonly damageType = DamageType.None;
+    readonly areaOfEffect = AreaOfEffect.Group;
 }

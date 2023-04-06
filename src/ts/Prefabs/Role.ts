@@ -1,12 +1,15 @@
-import { EffectRange } from "./Enums";
-import { Skill } from "./Skill";
+import { EffectRange, RoleNames } from "./Enums";
+import Skill from "./Skill";
 
-export abstract class Role {
-    abstract healthMultiplier: integer;
-    abstract physicalAttackMultiplier: integer;
-    abstract magicalAttackMultiplier: integer;
-    abstract physicalDefenseMultiplier: integer;
-    abstract magicalDefenseMultiplier: integer;
-    abstract effectRange: EffectRange;
-    abstract skills: [Skill, integer][];
+export default abstract class Role {
+    abstract readonly roleName: RoleNames;
+    static readonly spriteFileName = "tileset";
+    abstract readonly positionInSpreadsheet;
+    abstract readonly healthMultiplier: number;
+    abstract readonly physicalAttackMultiplier: number;
+    abstract readonly magicalAttackMultiplier: number;
+    abstract readonly physicalDefenseMultiplier: number;
+    abstract readonly magicalDefenseMultiplier: number;
+    abstract readonly effectRange: EffectRange;
+    abstract readonly skills: [number, string][];
 }

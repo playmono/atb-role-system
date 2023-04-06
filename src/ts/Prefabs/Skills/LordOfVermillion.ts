@@ -1,8 +1,8 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
-import { Skill } from "../Skill";
+import Skill from "../Skill";
 
-export class LordOfVermillion extends Skill {
-    effectRange: EffectRange.Two;
-    damageType: DamageType.Magical;
-    areaOfEffect: AreaOfEffect.Group;
+export default class LordOfVermillion implements Skill {
+    readonly effectRange = EffectRange.Two;
+    readonly damageType = DamageType.Magical;
+    readonly areaOfEffect = AreaOfEffect.Group;
 }
