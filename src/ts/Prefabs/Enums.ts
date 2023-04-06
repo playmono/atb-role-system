@@ -31,8 +31,8 @@ export enum LanePosition {
 };
 
 export enum Rows {
-    FIRST_ROW = 0,
-    SECOND_ROW = 1,
+    ABOVE_ROW = 0,
+    BELOW_ROW = 1,
 };
 
 export enum Columns {

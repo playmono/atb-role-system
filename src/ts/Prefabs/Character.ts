@@ -3,9 +3,10 @@ import Role from "./Role";
 import Novice from "./Roles/Novice";
 import Skill from "./Skill";
 
-export default class Hero {
+export default abstract class Character {
     level: integer;
     role: Role;
+    readonly row: Rows;
     lanePosition: LanePosition;
     sprite: Phaser.GameObjects.Sprite;
     health: {
@@ -23,7 +24,7 @@ export default class Hero {
 
     skills: Array<Skill>;
 
-    constructor(scene: Phaser.Scene, row: Rows, column: Columns) {
+    constructor(scene: Phaser.Scene, column: Columns) {
         this.level = 1;
         this.role = new Novice();
         this.lanePosition = LanePosition.FORWARD;
@@ -32,11 +33,11 @@ export default class Hero {
         const oneThirdY = scene.cameras.main.width / 3;
 
         // Since the LanePosition is FORWARD, we add/subtract 30px
-        const offsetY = row === Rows.FIRST_ROW && column === Columns.FIRST_COLUMN ? 30 : -30;
+        const offsetY = this.row === Rows.ABOVE_ROW && column === Columns.FIRST_COLUMN ? 30 : -30;
 
         this.sprite = scene.add.sprite(
             oneQuarterX * (column * 2 + 1),
-            oneThirdY * (row * 3 + 1) + offsetY,
+            oneThirdY * (this.row * 3 + 1) + offsetY,
             Role.spriteFileName,
             this.role.positionInSpreadsheet
         );
@@ -45,8 +46,5 @@ export default class Hero {
 
         // Novices in spritesheet is looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column < 2;
-
-        const tint = row === Rows.FIRST_ROW ? 0xff8b87 : 0xa3e0ff;
-        this.sprite.setTint(tint);
     }
 }
