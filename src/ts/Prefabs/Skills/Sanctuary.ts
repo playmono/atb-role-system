@@ -2,7 +2,8 @@ import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
 import Skill from "../Skill";
 
 export default class Sanctuary implements Skill {
-    readonly effectRange = EffectRange.One;
-    readonly damageType = DamageType.None;
-    readonly areaOfEffect = AreaOfEffect.Group;
+    static readonly spriteName = "sword";
+    static readonly effectRange = EffectRange.One;
+    static readonly damageType = DamageType.None;
+    static readonly areaOfEffect = AreaOfEffect.Group;
 }

@@ -2,7 +2,8 @@ import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
 import Skill from "../Skill";
 
 export default class MagnumBreak implements Skill {
-    readonly effectRange = EffectRange.One;
-    readonly damageType = DamageType.None;
-    readonly areaOfEffect = AreaOfEffect.Row;
+    static readonly spriteName = "sword";
+    static readonly effectRange = EffectRange.One;
+    static readonly damageType = DamageType.None;
+    static readonly areaOfEffect = AreaOfEffect.Row;
 }

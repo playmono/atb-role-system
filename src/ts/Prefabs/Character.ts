@@ -1,3 +1,4 @@
+import AtbBar from "./AtbBar";
 import { Columns, LanePosition, Rows } from "./Enums";
 import Role from "./Role";
 import Novice from "./Roles/Novice";
@@ -5,7 +6,7 @@ import Skill from "./Skill";
 
 export default abstract class Character {
     level: integer;
-    role: Role;
+    role: typeof Role;
     readonly row: Rows;
     lanePosition: LanePosition;
     sprite: Phaser.GameObjects.Sprite;
@@ -22,13 +23,26 @@ export default abstract class Character {
         magical: integer,
     };
 
-    skills: Array<Skill>;
+    skills: Array<typeof Skill> = [];
 
-    constructor(scene: Phaser.Scene, column: Columns) {
+    atbBar: AtbBar;
+
+    constructor() {
         this.level = 1;
-        this.role = new Novice();
+        this.role = Novice;
         this.lanePosition = LanePosition.FORWARD;
+        this.atbBar = new AtbBar(this);
 
+        this.role.skills.forEach(([level, skill]) => {
+            if (level > this.level) {
+                return;
+            }
+
+            this.skills.push(skill);
+        })
+    }
+
+    render(scene: Phaser.Scene, column: Columns): Phaser.GameObjects.Sprite {
         const oneQuarterX = scene.cameras.main.width / 8;
         const oneThirdY = scene.cameras.main.width / 3;
 
@@ -46,5 +60,9 @@ export default abstract class Character {
 
         // Novices in spritesheet is looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column < 2;
+
+        this.atbBar.render();
+
+        return this.sprite;
     }
 }
