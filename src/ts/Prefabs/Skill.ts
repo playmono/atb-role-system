@@ -48,10 +48,6 @@ export default class Skill {
     }
 
     onOverlap() {
-        const hero = AllyQueue.getQueue().getFirst();
-        hero.sprite.setTint(0xa3e0ff);
-        hero.atbBar.progressBar.destroy();
-        hero.atbBar.render();
         this.sprite.destroy();
         AllyQueue.getQueue().nextTurn();
     }

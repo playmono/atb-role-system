@@ -16,7 +16,7 @@ export default class AllyQueue extends Queue<Ally> {
         return AllyQueue.instance;
     }
 
-    enqueue(ally: Ally): void {
+    public enqueue(ally: Ally): void {
         super.enqueue(ally);
 
         if (this.items.length > 1) {
@@ -26,7 +26,9 @@ export default class AllyQueue extends Queue<Ally> {
         this.getFirst().startTurn();
     }
 
-    nextTurn(): void {
+    public nextTurn(): void {
+        const hero = this.getFirst();
+        hero.sprite.emit('endTurn');
         this.endTurn();
 
         if (this.isEmpty()) {
@@ -36,7 +38,7 @@ export default class AllyQueue extends Queue<Ally> {
         this.getFirst().startTurn();
     }
 
-    endTurn(): void {
+    private endTurn(): void {
         super.dequeue();
     }
 }

@@ -15,15 +15,23 @@ export default class Ally extends Character {
         super.render(scene, column);
         this.sprite.setTint(0xa3e0ff);
 
+        this.sprite.on('endTurn', this.endTurn, this);
+
         return this.sprite;
     }
 
-    startTurn() {
+    startTurn(): void {
         this.sprite.setTint(0xfbff17);
 
         this.currentRole.getAvailableSkills().forEach((skill) => {
             const skillObject = new skill[1]();
             skillObject.render(this.sprite.scene);
         });
+    }
+
+    endTurn(): void {
+        this.sprite.setTint(0xa3e0ff);
+        this.atbBar.progressBar.destroy();
+        this.atbBar.render();
     }
 }
