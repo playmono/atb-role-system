@@ -8,7 +8,8 @@ import Protection from "../Skills/Protection";
 import Provoke from "../Skills/Provoke";
 import Ragnarok from "../Skills/Ragnarok";
 
-export default class Warrior implements Role {
+export default class Warrior extends Role {
+    level: number = 1;
     static readonly roleName = RoleNames.WARRIOR;
     static readonly positionInSpreadsheet = 2;
     static readonly healthMultiplier = 3;
@@ -26,4 +27,8 @@ export default class Warrior implements Role {
         [20, MagnumBreak],
         [30, Ragnarok]
     ];
+
+    getAvailableSkills() {
+        return Warrior.skills.filter((skill) => skill[0] >= this.level);
+    }
 }

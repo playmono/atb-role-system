@@ -8,7 +8,8 @@ import Ragnarok from "../Skills/Ragnarok";
 import SpiritualMind from "../Skills/SpiritualMind";
 import StoneCurse from "../Skills/StoneCurse";
 
-export default class BlackMage implements Role {
+export default class BlackMage extends Role{
+    level: number = 1;
     static readonly roleName = RoleNames.BLACKMAGE;
     static readonly positionInSpreadsheet = 4;
     static readonly healthMultiplier = 2;
@@ -26,4 +27,8 @@ export default class BlackMage implements Role {
         [20, MedusaGlance],
         [30, Ragnarok]
     ];
+
+    getAvailableSkills() {
+        return BlackMage.skills.filter((skill) => skill[0] >= this.level);
+    }
 }

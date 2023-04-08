@@ -8,7 +8,8 @@ import Ragnarok from "../Skills/Ragnarok";
 import Resurrection from "../Skills/Resurrection";
 import Sanctuary from "../Skills/Sanctuary";
 
-export default class WhiteMage implements Role {
+export default class WhiteMage extends Role {
+    level: number = 1;
     static readonly roleName = RoleNames.WHITE_MAGE;
     static readonly positionInSpreadsheet = 5;
     static readonly healthMultiplier = 3;
@@ -26,4 +27,8 @@ export default class WhiteMage implements Role {
         [20, Sanctuary],
         [30, Ragnarok]
     ];
+
+    getAvailableSkills() {
+        return WhiteMage.skills.filter((skill) => skill[0] >= this.level);
+    }
 }

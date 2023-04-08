@@ -1,7 +1,7 @@
 import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
 import Skill from "../Skill";
 
-export default class MedusaGlance implements Skill {
+export default class MedusaGlance extends Skill {
     static readonly spriteName = "sword";
     static readonly effectRange = EffectRange.Two;
     static readonly damageType = DamageType.None;

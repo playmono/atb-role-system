@@ -8,7 +8,8 @@ import FireArrow from "../Skills/FireArrow";
 import Ragnarok from "../Skills/Ragnarok";
 import SharpShoot from "../Skills/SharpShoot";
 
-export default class Archer implements Role {
+export default class Archer extends Role {
+    level: number = 1;
     static readonly roleName = RoleNames.ARCHER;
     static readonly positionInSpreadsheet = 2;
     static readonly healthMultiplier = 3;
@@ -26,4 +27,8 @@ export default class Archer implements Role {
         [20, SharpShoot],
         [30, Ragnarok]
     ];
+
+    getAvailableSkills() {
+        return Archer.skills.filter((skill) => skill[0] >= this.level);
+    }
 }

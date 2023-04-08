@@ -1,9 +1,10 @@
 import { EffectRange, RoleNames } from "../Enums";
 import Role from "../Role";
-import Attack from "../Skills/Attack";
 import Skill from "../Skill";
+import Attack from "../Skills/Attack";
 
-export default class Novice implements Role {
+export default class Novice extends Role {
+    level: number = 1;
     static readonly spriteFileName = "tileset";
     static readonly roleName = RoleNames.NOVICE;
     static readonly positionInSpreadsheet =7;
@@ -17,4 +18,8 @@ export default class Novice implements Role {
     static readonly skills: [number, typeof Skill][] = [
         [1, Attack]
     ];
+
+    getAvailableSkills() {
+        return Novice.skills.filter((skill) => skill[0] >= this.level);
+    }
 }

@@ -1,5 +1,6 @@
 import Character from "../Character";
 import { Rows, Columns } from "../Enums";
+import Skill from "../Skill";
 
 export default class Enemy extends Character {
     readonly row = Rows.ABOVE_ROW;
