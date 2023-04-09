@@ -1,6 +1,4 @@
-import Battlefield from "../../Scenes/Battlefied";
 import { EffectRange, RoleNames } from "../Enums";
-import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Skill from "../Skill";
 import Attack from "../Skills/Attack";
@@ -25,32 +23,14 @@ export default class WhiteMage extends Role {
     static readonly skills: [number, typeof Skill][] = [
         [1, Attack],
         [2, Heal],
-        [5, Cure],
+        /*[5, Cure],
         [10, Blessing],
         [15, Resurrection],
         [20, Sanctuary],
-        [30, Ragnarok]
+        [30, Ragnarok]*/
     ];
 
     getAvailableSkills() {
         return WhiteMage.skills.filter((skill) => skill[0] <= this.level);
-    }
-
-    render(scene: Phaser.Scene): void {
-        const sprite = scene.add.sprite(
-            scene.cameras.main.centerX + 150,
-            scene.cameras.main.centerY,
-            WhiteMage.spriteFileName,
-            WhiteMage.positionInSpreadsheet
-        ).setInteractive();
-
-        Battlefield.turnElements.add(sprite);
-
-        sprite.on('pointerdown', function(pointer) {
-            const currentAlly = AllyQueue.getQueue().getFirst();
-            currentAlly.setRole(WhiteMage);
-            currentAlly.renderRole(scene);
-            AllyQueue.getQueue().nextTurn();
-        });
     }
 }

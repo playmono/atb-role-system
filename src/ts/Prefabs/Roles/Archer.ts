@@ -1,6 +1,4 @@
-import Battlefield from "../../Scenes/Battlefied";
 import { EffectRange, RoleNames } from "../Enums";
-import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Skill from "../Skill";
 import AnkleTrap from "../Skills/AnkleTrap";
@@ -25,32 +23,14 @@ export default class Archer extends Role {
     static readonly skills: [number, typeof Skill][] = [
         [1, Attack],
         [2, FireArrow],
-        [5, Concentration],
+        /*[5, Concentration],
         [10, AnkleTrap],
         [15, ArrowVulcan],
         [20, SharpShoot],
-        [30, Ragnarok]
+        [30, Ragnarok]*/
     ];
 
     getAvailableSkills() {
         return Archer.skills.filter((skill) => skill[0] <= this.level);
-    }
-
-    render(scene: Phaser.Scene): void {
-        const sprite = scene.add.sprite(
-            scene.cameras.main.centerX,
-            scene.cameras.main.centerY,
-            Archer.spriteFileName,
-            Archer.positionInSpreadsheet
-        ).setInteractive();
-
-        Battlefield.turnElements.add(sprite);
-
-        sprite.on('pointerdown', function(pointer) {
-            const currentAlly = AllyQueue.getQueue().getFirst();
-            currentAlly.setRole(Archer);
-            currentAlly.renderRole(scene);
-            AllyQueue.getQueue().nextTurn();
-        });
     }
 }

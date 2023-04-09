@@ -1,6 +1,4 @@
-import Battlefield from "../../Scenes/Battlefied";
 import { EffectRange, RoleNames } from "../Enums";
-import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Skill from "../Skill";
 import Attack from "../Skills/Attack";
@@ -25,32 +23,14 @@ export default class Warrior extends Role {
     static readonly skills: [number, typeof Skill][] = [
         [1, Attack],
         [2, Bash],
-        [5, Provoke],
+        /*[5, Provoke],
         [10, Protection],
         [15, Berserk],
         [20, MagnumBreak],
-        [30, Ragnarok]
+        [30, Ragnarok]*/
     ];
 
     getAvailableSkills() {
         return Warrior.skills.filter((skill) => skill[0] <= this.level);
-    }
-
-    render(scene: Phaser.Scene): void {
-        const sprite = scene.add.sprite(
-            scene.cameras.main.centerX + 100,
-            scene.cameras.main.centerY,
-            Warrior.spriteFileName,
-            Warrior.positionInSpreadsheet
-        ).setInteractive();
-
-        Battlefield.turnElements.add(sprite);
-
-        sprite.on('pointerdown', function(pointer) {
-            const currentAlly = AllyQueue.getQueue().getFirst();
-            currentAlly.setRole(Warrior);
-            currentAlly.renderRole(scene);
-            AllyQueue.getQueue().nextTurn();
-        });
     }
 }

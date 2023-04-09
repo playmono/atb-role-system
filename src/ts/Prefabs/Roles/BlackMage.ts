@@ -1,6 +1,4 @@
-import Battlefield from "../../Scenes/Battlefied";
 import { EffectRange, RoleNames } from "../Enums";
-import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Skill from "../Skill";
 import Attack from "../Skills/Attack";
@@ -25,32 +23,14 @@ export default class BlackMage extends Role{
     static readonly skills: [number, typeof Skill][] = [
         [1, Attack],
         [2, FireBolt],
-        [5, StoneCurse],
+        /*[5, StoneCurse],
         [10, SpiritualMind],
         [15, LordOfVermillion],
         [20, MedusaGlance],
-        [30, Ragnarok]
+        [30, Ragnarok]*/
     ];
 
     getAvailableSkills() {
         return BlackMage.skills.filter((skill) => skill[0] <= this.level);
-    }
-
-    render(scene: Phaser.Scene): void {
-        const sprite = scene.add.sprite(
-            scene.cameras.main.centerX + 50,
-            scene.cameras.main.centerY,
-            BlackMage.spriteFileName,
-            BlackMage.positionInSpreadsheet
-        ).setInteractive();
-
-        Battlefield.turnElements.add(sprite);
-
-        sprite.on('pointerdown', function(pointer) {
-            const currentAlly = AllyQueue.getQueue().getFirst();
-            currentAlly.setRole(BlackMage);
-            currentAlly.renderRole(scene);
-            AllyQueue.getQueue().nextTurn();
-        });
     }
 }

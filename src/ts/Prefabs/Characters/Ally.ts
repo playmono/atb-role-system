@@ -1,7 +1,9 @@
 import Battlefield from "../../Scenes/Battlefied";
 import Character from "../Character";
+import { RolesMap } from "../Constants";
 import { Rows, Columns } from "../Enums";
 import AllyQueue from "../Queues/AllyQueue";
+import Novice from "../Roles/Novice";
 
 export default class Ally extends Character {
     scene: Phaser.Scene;
@@ -28,8 +30,19 @@ export default class Ally extends Character {
             skillObject.render(this.sprite.scene);
         });
 
+        let x = this.sprite.scene.cameras.main.centerX - 50;
+
         if (this.level >= 2) {
-            this.roles.forEach((role) => role.render(this.sprite.scene));
+            for (const role of Object.values(this.roles)) {
+                const roleType = Object.values(RolesMap).find((r) => role instanceof r);
+
+                if (roleType === Novice) {
+                    continue;
+                }
+
+                role.render(this.sprite.scene, roleType, x, this.sprite.scene.cameras.main.centerY + this.sprite.scene.cameras.main.centerY - 100);
+                x = x + 50;
+            }
         }
     }
 
