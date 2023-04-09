@@ -13,16 +13,18 @@ export default class Ally extends Character {
         AllyQueue.getQueue().enqueue(this);
     }
 
-    render(scene: Phaser.Scene, column: Columns): Phaser.GameObjects.Sprite  {
+    render(scene: Phaser.Scene, column: Columns): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody  {
         super.render(scene, column);
         this.sprite.setTint(0xa3e0ff);
 
-        this.sprite.on('endTurn', this.endTurn, this);
+        this.sprite.on('endTurn', this.onEndTurn, this);
+        this.sprite.on('holdTurn', this.onHoldTurn, this);
+        this.sprite.on('startTurn', this.onStartTurn, this);
 
         return this.sprite;
     }
 
-    startTurn(): void {
+    onStartTurn(): void {
         this.sprite.setTint(0xfbff17);
 
         // RENDER SKILLS
@@ -56,11 +58,16 @@ export default class Ally extends Character {
         }
     }
 
-    endTurn(): void {
+    onHoldTurn(): void {
+        Battlefield.turnElements.clear(true, true);
+        this.sprite.setTint(0xa3e0ff);
+    }
+
+    onEndTurn(): void {
         Battlefield.turnElements.clear(true, true);
         this.levelUp();
         this.sprite.setTint(0xa3e0ff);
-        this.atbBar.progressBar.destroy();
+        this.atbBar.bar.destroy();
         this.atbBar.render();
     }
 }

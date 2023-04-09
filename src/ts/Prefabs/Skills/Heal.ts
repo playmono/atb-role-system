@@ -7,4 +7,5 @@ export default class Heal extends Skill {
     static readonly damageType = DamageType.None;
     static readonly areaOfEffect = AreaOfEffect.Single;
     static readonly scale = 0.5;
+    static readonly damage: number = 30;
 }

@@ -16,11 +16,11 @@ export default abstract class Role {
     static readonly effectRange: EffectRange;
     static readonly skills: [number, typeof Skill][];
 
-    getAvailableSkills() {
+    public getAvailableSkills(): [number, typeof Skill][] {
         return Role.skills.filter((skill) => skill[0] <= this.level);
     }
 
-    render(scene: Phaser.Scene, roleType: typeof Role, x: number, y: number): void {
+    public render(scene: Phaser.Scene, roleType: typeof Role, x: number, y: number): void {
         const sprite = scene.add.sprite(
             x,
             y,
@@ -35,7 +35,7 @@ export default abstract class Role {
         if (currentAlly.currentRoleType === roleType) {
             sprite.setTint(0x2b2b2b);
         } else {
-            sprite.on('pointerdown', function(pointer) {
+            sprite.on('pointerdown', (pointer) => {
                 const currentAlly = AllyQueue.getQueue().getFirst();
                 currentAlly.setRole(roleType);
                 currentAlly.renderRole(scene);

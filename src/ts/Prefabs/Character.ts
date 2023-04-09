@@ -1,38 +1,33 @@
-import AtbBar from "./AtbBar";
 import { RolesMap } from "./Constants";
-import { Columns, LanePosition, RoleNames, Rows } from "./Enums";
+import { Columns, LanePosition, Rows } from "./Enums";
+import HealthBar from "./Bar/HealthBar";
+import AtbBar from "./Bar/AtbBar";
 import Role from "./Role";
 import Novice from "./Roles/Novice";
 
 export default abstract class Character {
-    level: integer;
+    level: number = 1;
     currentRole: Role;
     currentRoleType: typeof Role;
     readonly row: Rows;
     column: Columns;
-    lanePosition: LanePosition;
+    lanePosition: LanePosition = LanePosition.FORWARD;
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-    health: {
-        current: integer,
-        max: integer,
-    };
-    attack: {
-        physical: integer,
-        magical: integer,
-    };
-    defense: {
-        physical: integer,
-        magical: integer,
-    };
+    healthCurrent: number = 100;
+    healthMax: number = 100;
+    attackPhysical: number = 10;
+    attackMagical: number = 7;
+    defensePhysical: number = 4;
+    defenseMagical: number = 2;
 
     roles: Array<Role> = [];
 
+    healthBar: HealthBar;
     atbBar: AtbBar;
     levelsText: Phaser.GameObjects.Text;
 
     constructor() {
-        this.level = 1;
-        this.lanePosition = LanePosition.FORWARD;
+        this.healthBar = new HealthBar(this);
         this.atbBar = new AtbBar(this);
         this.setRole(Novice);
 
@@ -63,7 +58,7 @@ export default abstract class Character {
         // Do nothing
     }
 
-    render(scene: Phaser.Scene, column: Columns): Phaser.GameObjects.Sprite {
+    render(scene: Phaser.Scene, column: Columns): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
         this.column = column;
 
         const oneQuarterX = scene.cameras.main.width / 8;
@@ -76,14 +71,18 @@ export default abstract class Character {
             oneThirdY * (this.row * 3 + 1) + offsetY,
             this.currentRoleType.spriteFileName,
             this.currentRoleType.positionInSpreadsheet
-        );
+        ).setInteractive();
 
+        this.sprite['__parentClass'] = this;
         this.sprite.body.setCircle(15, 15);
         this.sprite.body.setOffset(0, 0);
         this.sprite.scale = 2;
 
         // Novices in spritesheet is looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column > 1;
+
+        this.sprite.on('receiveSkill', this.onReceiveSkill, this);
+        this.sprite.on('die', this.onDie, this);
 
         this.levelsText = scene.add.text(
             this.sprite.getTopCenter().x - 10,
@@ -92,6 +91,7 @@ export default abstract class Character {
         );
         this.updateLevelsText();
 
+        this.healthBar.render();
         this.atbBar.render();
 
         return this.sprite;
@@ -112,5 +112,28 @@ export default abstract class Character {
         this.level++;
         this.currentRole.level++;
         this.updateLevelsText();
+    }
+
+    protected onReceiveSkill(damage: number): void {
+        let result = this.healthCurrent + damage;
+
+        if (result <= 0) {
+            this.onDie();
+        }
+
+        if (result > this.healthMax) {
+            result = this.healthMax
+        }
+
+        this.healthCurrent = result;
+        this.healthBar.update();
+    }
+
+    protected onDie(): void {
+        this.sprite.destroy();
+        this.levelsText.destroy();
+        this.atbBar.bar.destroy();
+        this.atbBar.progressBox.destroy();
+        this.healthBar.bar.destroy();
     }
 }
