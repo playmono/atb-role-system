@@ -1,15 +1,18 @@
+import Battlefield from "../../Scenes/Battlefied";
 import { EffectRange, RoleNames } from "../Enums";
+import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Skill from "../Skill";
 import AnkleTrap from "../Skills/AnkleTrap";
 import ArrowVulcan from "../Skills/ArrowVulcan";
+import Attack from "../Skills/Attack";
 import Concentration from "../Skills/Concentration";
 import FireArrow from "../Skills/FireArrow";
 import Ragnarok from "../Skills/Ragnarok";
 import SharpShoot from "../Skills/SharpShoot";
 
 export default class Archer extends Role {
-    level: number = 1;
+    level: number = 0;
     static readonly roleName = RoleNames.ARCHER;
     static readonly positionInSpreadsheet = 2;
     static readonly healthMultiplier = 3;
@@ -19,7 +22,8 @@ export default class Archer extends Role {
     static readonly magicalDefenseMultiplier = 1;
     static readonly effectRange = EffectRange.Two;
 
-    readonly skills: [number, typeof Skill][] = [
+    static readonly skills: [number, typeof Skill][] = [
+        [1, Attack],
         [2, FireArrow],
         [5, Concentration],
         [10, AnkleTrap],
@@ -29,6 +33,24 @@ export default class Archer extends Role {
     ];
 
     getAvailableSkills() {
-        return Archer.skills.filter((skill) => skill[0] >= this.level);
+        return Archer.skills.filter((skill) => skill[0] <= this.level);
+    }
+
+    render(scene: Phaser.Scene): void {
+        const sprite = scene.add.sprite(
+            scene.cameras.main.centerX,
+            scene.cameras.main.centerY,
+            Archer.spriteFileName,
+            Archer.positionInSpreadsheet
+        ).setInteractive();
+
+        Battlefield.turnElements.add(sprite);
+
+        sprite.on('pointerdown', function(pointer) {
+            const currentAlly = AllyQueue.getQueue().getFirst();
+            currentAlly.setRole(Archer);
+            currentAlly.renderRole(scene);
+            AllyQueue.getQueue().nextTurn();
+        });
     }
 }

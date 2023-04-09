@@ -20,6 +20,15 @@ export default class Novice extends Role {
     ];
 
     getAvailableSkills() {
-        return Novice.skills.filter((skill) => skill[0] >= this.level);
+        return Novice.skills.filter((skill) => skill[0] <= this.level);
+    }
+
+    render(scene: Phaser.Scene): void {
+        /*scene.add.sprite(
+            scene.cameras.main.centerX + 100,
+            scene.cameras.main.centerY,
+            Novice.spriteFileName,
+            Novice.positionInSpreadsheet
+        );*/
     }
 }

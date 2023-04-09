@@ -1,4 +1,4 @@
-import BattleField from "../../Scenes/Battlefied";
+import Battlefield from "../../Scenes/Battlefied";
 import Character from "../Character";
 import { Rows, Columns } from "../Enums";
 import AllyQueue from "../Queues/AllyQueue";
@@ -27,9 +27,15 @@ export default class Ally extends Character {
             const skillObject = new skill[1]();
             skillObject.render(this.sprite.scene);
         });
+
+        if (this.level >= 2) {
+            this.roles.forEach((role) => role.render(this.sprite.scene));
+        }
     }
 
     endTurn(): void {
+        Battlefield.turnElements.clear(true, true);
+        this.levelUp();
         this.sprite.setTint(0xa3e0ff);
         this.atbBar.progressBar.destroy();
         this.atbBar.render();

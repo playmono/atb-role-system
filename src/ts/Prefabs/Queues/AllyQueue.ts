@@ -27,8 +27,6 @@ export default class AllyQueue extends Queue<Ally> {
     }
 
     public nextTurn(): void {
-        const hero = this.getFirst();
-        hero.sprite.emit('endTurn');
         this.endTurn();
 
         if (this.isEmpty()) {
@@ -39,6 +37,12 @@ export default class AllyQueue extends Queue<Ally> {
     }
 
     private endTurn(): void {
+        if (this.isEmpty()) {
+            return;
+        }
+
+        const hero = this.getFirst();
+        hero.sprite.emit('endTurn');
         super.dequeue();
     }
 }

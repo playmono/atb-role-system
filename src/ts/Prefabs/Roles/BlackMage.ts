@@ -1,6 +1,9 @@
+import Battlefield from "../../Scenes/Battlefied";
 import { EffectRange, RoleNames } from "../Enums";
+import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Skill from "../Skill";
+import Attack from "../Skills/Attack";
 import FireBolt from "../Skills/Firebolt";
 import LordOfVermillion from "../Skills/LordOfVermillion";
 import MedusaGlance from "../Skills/MedusaGlance";
@@ -9,7 +12,7 @@ import SpiritualMind from "../Skills/SpiritualMind";
 import StoneCurse from "../Skills/StoneCurse";
 
 export default class BlackMage extends Role{
-    level: number = 1;
+    level: number = 0;
     static readonly roleName = RoleNames.BLACKMAGE;
     static readonly positionInSpreadsheet = 4;
     static readonly healthMultiplier = 2;
@@ -19,7 +22,8 @@ export default class BlackMage extends Role{
     static readonly magicalDefenseMultiplier = 5;
     static readonly effectRange = EffectRange.One;
 
-    readonly skills: [number, typeof Skill][] = [
+    static readonly skills: [number, typeof Skill][] = [
+        [1, Attack],
         [2, FireBolt],
         [5, StoneCurse],
         [10, SpiritualMind],
@@ -29,6 +33,24 @@ export default class BlackMage extends Role{
     ];
 
     getAvailableSkills() {
-        return BlackMage.skills.filter((skill) => skill[0] >= this.level);
+        return BlackMage.skills.filter((skill) => skill[0] <= this.level);
+    }
+
+    render(scene: Phaser.Scene): void {
+        const sprite = scene.add.sprite(
+            scene.cameras.main.centerX + 50,
+            scene.cameras.main.centerY,
+            BlackMage.spriteFileName,
+            BlackMage.positionInSpreadsheet
+        ).setInteractive();
+
+        Battlefield.turnElements.add(sprite);
+
+        sprite.on('pointerdown', function(pointer) {
+            const currentAlly = AllyQueue.getQueue().getFirst();
+            currentAlly.setRole(BlackMage);
+            currentAlly.renderRole(scene);
+            AllyQueue.getQueue().nextTurn();
+        });
     }
 }

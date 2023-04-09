@@ -7,6 +7,7 @@ export default class Battlefield extends Phaser.Scene {
 	public static Name = "Battlefield";
 	static allyGroup: Phaser.GameObjects.Group;
 	static enemyGroup: Phaser.GameObjects.Group;
+	static turnElements: Phaser.GameObjects.Group;
 
 	public preload(): void {
 		// Preload as needed.
@@ -15,8 +16,9 @@ export default class Battlefield extends Phaser.Scene {
 	public create(): void {
 		Utilities.LogSceneMethodEntry("Battlefield", "create");
 
-		Battlefield.enemyGroup = this.physics.add.group({});
-		Battlefield.allyGroup = this.physics.add.group({});
+		Battlefield.enemyGroup = this.physics.add.group();
+		Battlefield.allyGroup = this.physics.add.group();
+		Battlefield.turnElements = this.physics.add.group();
 
 		const hero1 = new Hero()
 		hero1.render(this, Columns.FIRST_COLUMN);

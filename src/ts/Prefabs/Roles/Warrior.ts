@@ -1,6 +1,9 @@
+import Battlefield from "../../Scenes/Battlefied";
 import { EffectRange, RoleNames } from "../Enums";
+import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Skill from "../Skill";
+import Attack from "../Skills/Attack";
 import Bash from "../Skills/Bash";
 import Berserk from "../Skills/Berserk";
 import MagnumBreak from "../Skills/MagnumBreak";
@@ -9,9 +12,9 @@ import Provoke from "../Skills/Provoke";
 import Ragnarok from "../Skills/Ragnarok";
 
 export default class Warrior extends Role {
-    level: number = 1;
+    level: number = 0;
     static readonly roleName = RoleNames.WARRIOR;
-    static readonly positionInSpreadsheet = 2;
+    static readonly positionInSpreadsheet = 0;
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;
     static readonly magicalAttackMultiplier = 2;
@@ -19,7 +22,8 @@ export default class Warrior extends Role {
     static readonly magicalDefenseMultiplier = 1;
     static readonly effectRange = EffectRange.One;
 
-    readonly skills: [number, typeof Skill][] = [
+    static readonly skills: [number, typeof Skill][] = [
+        [1, Attack],
         [2, Bash],
         [5, Provoke],
         [10, Protection],
@@ -29,6 +33,24 @@ export default class Warrior extends Role {
     ];
 
     getAvailableSkills() {
-        return Warrior.skills.filter((skill) => skill[0] >= this.level);
+        return Warrior.skills.filter((skill) => skill[0] <= this.level);
+    }
+
+    render(scene: Phaser.Scene): void {
+        const sprite = scene.add.sprite(
+            scene.cameras.main.centerX + 100,
+            scene.cameras.main.centerY,
+            Warrior.spriteFileName,
+            Warrior.positionInSpreadsheet
+        ).setInteractive();
+
+        Battlefield.turnElements.add(sprite);
+
+        sprite.on('pointerdown', function(pointer) {
+            const currentAlly = AllyQueue.getQueue().getFirst();
+            currentAlly.setRole(Warrior);
+            currentAlly.renderRole(scene);
+            AllyQueue.getQueue().nextTurn();
+        });
     }
 }

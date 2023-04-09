@@ -1,4 +1,4 @@
-import BattleField from "../Scenes/Battlefied";
+import Battlefield from "../Scenes/Battlefied";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 import AllyQueue from "./Queues/AllyQueue";
 
@@ -9,14 +9,16 @@ export default class Skill {
     static readonly damageType: DamageType;
     static readonly areaOfEffect: AreaOfEffect;
 
-    render(scene: Phaser.Scene): Phaser.GameObjects.Sprite {
+    public render(scene: Phaser.Scene): Phaser.GameObjects.Sprite {
         this.sprite = scene.physics.add.sprite(
-            scene.cameras.main.centerX,
+            scene.cameras.main.centerX / 2,
             scene.cameras.main.centerY,
             Skill.spriteName
         ).setInteractive();
 
-        this.sprite['__initialX'] = scene.cameras.main.centerX;
+        Battlefield.turnElements.add(this.sprite);
+
+        this.sprite['__initialX'] = scene.cameras.main.centerX / 2;
         this.sprite['__initialY'] = scene.cameras.main.centerY;
 
         this.sprite.scale = 0.5;
@@ -27,11 +29,11 @@ export default class Skill {
         return this.sprite;
     }
 
-    configureOverlap() {
+    private configureOverlap(): void {
         if (Skill.effectRange !== EffectRange.Self) {
             this.sprite.scene.physics.add.overlap(
                 this.sprite,
-                BattleField.enemyGroup,
+                Battlefield.enemyGroup,
                 this.onOverlap,
                 null,
                 this
@@ -39,7 +41,7 @@ export default class Skill {
 
             this.sprite.scene.physics.add.overlap(
                 this.sprite,
-                BattleField.allyGroup,
+                Battlefield.allyGroup,
                 this.onOverlap,
                 null,
                 this
@@ -47,8 +49,7 @@ export default class Skill {
         }
     }
 
-    onOverlap() {
-        this.sprite.destroy();
+    private onOverlap(): void {
         AllyQueue.getQueue().nextTurn();
     }
 }

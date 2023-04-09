@@ -15,6 +15,8 @@ export default abstract class Role {
     static readonly skills: [number, typeof Skill][];
 
     getAvailableSkills() {
-        return Role.skills.filter((skill) => skill[0] >= this.level);
+        return Role.skills.filter((skill) => skill[0] <= this.level);
     }
+
+    abstract render(scene: Phaser.Scene): void;
 }
