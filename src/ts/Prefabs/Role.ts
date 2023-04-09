@@ -20,7 +20,7 @@ export default abstract class Role {
         return Role.skills.filter((skill) => skill[0] <= this.level);
     }
 
-    render(scene: Phaser.Scene, roleType: any, x: number, y: number): void {
+    render(scene: Phaser.Scene, roleType: typeof Role, x: number, y: number): void {
         const sprite = scene.add.sprite(
             x,
             y,

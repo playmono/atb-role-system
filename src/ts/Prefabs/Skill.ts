@@ -3,26 +3,33 @@ import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 import AllyQueue from "./Queues/AllyQueue";
 
 export default class Skill {
-    sprite: Phaser.GameObjects.Sprite;
-    static readonly spriteName = "sword";
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    static readonly spriteName: string;
     static readonly effectRange: EffectRange;
     static readonly damageType: DamageType;
     static readonly areaOfEffect: AreaOfEffect;
+    static readonly scale: number = 1;
 
-    public render(scene: Phaser.Scene): Phaser.GameObjects.Sprite {
+    public render(scene: Phaser.Scene, skillType: typeof Skill, x: number, y: number): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
         this.sprite = scene.physics.add.sprite(
-            scene.cameras.main.centerX / 2,
-            scene.cameras.main.centerY,
-            Skill.spriteName
+            x,
+            y,
+            skillType.spriteName
         ).setInteractive();
+
+        this.sprite.body.setCircle(35);
+        //this.sprite.body.setOffset(15,15);
+
+        this.sprite.scale = skillType.scale;
 
         Battlefield.turnElements.add(this.sprite);
 
-        this.sprite['__initialX'] = scene.cameras.main.centerX / 2;
-        this.sprite['__initialY'] = scene.cameras.main.centerY;
+        this.sprite['__initialX'] = x;
+        this.sprite['__initialY'] = y;
 
-        this.sprite.scale = 0.5;
         scene.input.setDraggable(this.sprite);
+
+        //this.sprite.addListener('dragend', this.onDragStop, this);
 
         this.configureOverlap();
 
@@ -51,5 +58,9 @@ export default class Skill {
 
     private onOverlap(): void {
         AllyQueue.getQueue().nextTurn();
+    }
+
+    private onDragStop() {
+        this.configureOverlap();
     }
 }

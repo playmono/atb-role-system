@@ -9,7 +9,7 @@ export default class Ally extends Character {
     scene: Phaser.Scene;
     readonly row = Rows.BELOW_ROW;
 
-    barReady() {
+    barReady(): void {
         AllyQueue.getQueue().enqueue(this);
     }
 
@@ -25,24 +25,34 @@ export default class Ally extends Character {
     startTurn(): void {
         this.sprite.setTint(0xfbff17);
 
+        // RENDER SKILLS
+
+        let y = this.sprite.scene.cameras.main.centerY
+        let x = this.sprite.scene.cameras.main.centerX / 2;
+
         this.currentRole.getAvailableSkills().forEach((skill) => {
-            const skillObject = new skill[1]();
-            skillObject.render(this.sprite.scene);
+            const skillType = skill[1];
+            const skillObject = new skillType();
+            skillObject.render(this.sprite.scene, skillType, x, y);
+            x = x + 50;
         });
 
-        let x = this.sprite.scene.cameras.main.centerX - 50;
+        // RENDER ROLES
+
+        y = this.sprite.scene.cameras.main.centerY + this.sprite.scene.cameras.main.centerY - 100;
+        x = this.sprite.scene.cameras.main.centerX - 50;
 
         if (this.level >= 2) {
-            for (const role of Object.values(this.roles)) {
+            Object.values(this.roles).forEach((role) => {
                 const roleType = Object.values(RolesMap).find((r) => role instanceof r);
 
                 if (roleType === Novice) {
-                    continue;
+                    return;
                 }
 
-                role.render(this.sprite.scene, roleType, x, this.sprite.scene.cameras.main.centerY + this.sprite.scene.cameras.main.centerY - 100);
+                role.render(this.sprite.scene, roleType, x, y);
                 x = x + 50;
-            }
+            });
         }
     }
 

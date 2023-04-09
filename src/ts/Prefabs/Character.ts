@@ -11,7 +11,7 @@ export default abstract class Character {
     readonly row: Rows;
     column: Columns;
     lanePosition: LanePosition;
-    sprite: Phaser.GameObjects.Sprite;
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     health: {
         current: integer,
         max: integer,
@@ -69,24 +69,25 @@ export default abstract class Character {
         const oneQuarterX = scene.cameras.main.width / 8;
         const oneThirdY = scene.cameras.main.width / 3;
 
-        // Since the LanePosition is FORWARD, we add/subtract 30px
-        const offsetY = this.row === Rows.ABOVE_ROW && column === Columns.FIRST_COLUMN ? 30 : -30;
+        const offsetY = this.row === Rows.BELOW_ROW ? -30 : 0;
 
-        this.sprite = scene.add.sprite(
+        this.sprite = scene.physics.add.sprite(
             oneQuarterX * (column * 2 + 1),
             oneThirdY * (this.row * 3 + 1) + offsetY,
             this.currentRoleType.spriteFileName,
             this.currentRoleType.positionInSpreadsheet
         );
 
+        this.sprite.body.setCircle(15, 15);
+        this.sprite.body.setOffset(0, 0);
         this.sprite.scale = 2;
 
         // Novices in spritesheet is looking in the other direction, so flip them if column < 2
-        this.sprite.flipX = column < 2;
+        this.sprite.flipX = column > 1;
 
         this.levelsText = scene.add.text(
-            this.sprite.getTopCenter().x,
-            this.sprite.getTopCenter().y -30,
+            this.sprite.getTopCenter().x - 10,
+            this.sprite.getTopCenter().y - 30,
             ''
         );
         this.updateLevelsText();
@@ -101,8 +102,6 @@ export default abstract class Character {
             this.currentRoleType.spriteFileName,
             this.currentRoleType.positionInSpreadsheet
         );
-
-        this.sprite.flipX = this.column > 2;
     }
 
     protected updateLevelsText(): void {

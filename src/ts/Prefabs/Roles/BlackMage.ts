@@ -10,9 +10,8 @@ import SpiritualMind from "../Skills/SpiritualMind";
 import StoneCurse from "../Skills/StoneCurse";
 
 export default class BlackMage extends Role{
-    level: number = 0;
     static readonly roleName = RoleNames.BLACKMAGE;
-    static readonly positionInSpreadsheet = 4;
+    static readonly positionInSpreadsheet = 8;
     static readonly healthMultiplier = 2;
     static readonly physicalAttackMultiplier = 1;
     static readonly magicalAttackMultiplier = 5;

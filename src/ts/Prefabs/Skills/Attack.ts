@@ -6,4 +6,5 @@ export default class Attack extends Skill {
     static readonly effectRange = EffectRange.One;
     static readonly damageType = DamageType.Physical;
     static readonly areaOfEffect = AreaOfEffect.Single;
+    static readonly scale = 0.5;
 }

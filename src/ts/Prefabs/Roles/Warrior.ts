@@ -10,7 +10,6 @@ import Provoke from "../Skills/Provoke";
 import Ragnarok from "../Skills/Ragnarok";
 
 export default class Warrior extends Role {
-    level: number = 0;
     static readonly roleName = RoleNames.WARRIOR;
     static readonly positionInSpreadsheet = 0;
     static readonly healthMultiplier = 3;

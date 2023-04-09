@@ -10,9 +10,8 @@ import Resurrection from "../Skills/Resurrection";
 import Sanctuary from "../Skills/Sanctuary";
 
 export default class WhiteMage extends Role {
-    level: number = 0;
     static readonly roleName = RoleNames.WHITE_MAGE;
-    static readonly positionInSpreadsheet = 6;
+    static readonly positionInSpreadsheet = 12;
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;
     static readonly magicalAttackMultiplier = 2;

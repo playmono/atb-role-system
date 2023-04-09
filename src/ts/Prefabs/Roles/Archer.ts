@@ -10,9 +10,8 @@ import Ragnarok from "../Skills/Ragnarok";
 import SharpShoot from "../Skills/SharpShoot";
 
 export default class Archer extends Role {
-    level: number = 0;
     static readonly roleName = RoleNames.ARCHER;
-    static readonly positionInSpreadsheet = 2;
+    static readonly positionInSpreadsheet = 4;
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;
     static readonly magicalAttackMultiplier = 2;

@@ -4,10 +4,9 @@ import Skill from "../Skill";
 import Attack from "../Skills/Attack";
 
 export default class Novice extends Role {
-    level: number = 1;
     static readonly spriteFileName = "tileset";
     static readonly roleName = RoleNames.NOVICE;
-    static readonly positionInSpreadsheet =7;
+    static readonly positionInSpreadsheet = 13;
     static readonly healthMultiplier = 1;
     static readonly physicalAttackMultiplier = 1;
     static readonly magicalAttackMultiplier = 1;
