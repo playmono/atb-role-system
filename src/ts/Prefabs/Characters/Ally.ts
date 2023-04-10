@@ -17,14 +17,10 @@ export default class Ally extends Character {
         super.render(scene, column);
         this.sprite.setTint(0xa3e0ff);
 
-        this.sprite.on('endTurn', this.onEndTurn, this);
-        this.sprite.on('holdTurn', this.onHoldTurn, this);
-        this.sprite.on('startTurn', this.onStartTurn, this);
-
         return this.sprite;
     }
 
-    onStartTurn(): void {
+    startTurn(): void {
         this.sprite.setTint(0xfbff17);
 
         // RENDER SKILLS
@@ -58,12 +54,12 @@ export default class Ally extends Character {
         }
     }
 
-    onHoldTurn(): void {
+    holdTurn(): void {
         Battlefield.turnElements.clear(true, true);
         this.sprite.setTint(0xa3e0ff);
     }
 
-    onEndTurn(): void {
+    endTurn(): void {
         Battlefield.turnElements.clear(true, true);
         this.levelUp();
         this.sprite.setTint(0xa3e0ff);

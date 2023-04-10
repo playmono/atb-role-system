@@ -20,24 +20,11 @@ export default class AllyQueue extends Queue<Ally> {
         super.enqueue(ally);
 
         if (this.items.length > 1) {
-            ally.sprite.on('pointerdown', (pointer) => {
-                /*
-                const tempQueue = [];
-                this.getFirst().sprite.emit('holdTurn');
-                while(this.getFirst() !== ally) {
-                    const first = this.dequeue();
-                    tempQueue.push(first);
-                }
-                tempQueue.reverse().forEach((onHold) => {
-                    this.enqueue(onHold);
-                });
-                this.getFirst().startTurn();
-                */
-            });
+            this.configureOnHold(ally);
             return;
         }
 
-        this.getFirst().sprite.emit('startTurn');
+        this.getFirst().startTurn();
     }
 
     public nextTurn(): void {
@@ -47,7 +34,7 @@ export default class AllyQueue extends Queue<Ally> {
             return;
         }
 
-        this.getFirst().sprite.emit('startTurn');
+        this.getFirst().startTurn();
     }
 
     private endTurn(): void {
@@ -56,7 +43,21 @@ export default class AllyQueue extends Queue<Ally> {
         }
 
         const hero = this.getFirst();
-        hero.sprite.emit('endTurn');
+        this.disconfigureOnHold(hero);
+        hero.endTurn();
         super.dequeue();
+    }
+
+    private configureOnHold(ally: Ally): void {
+        ally.sprite.on('pointerdown', (pointer) => {
+            this.getFirst().holdTurn();
+            this.configureOnHold(this.getFirst());
+            this.putFirst(ally);
+            this.getFirst().startTurn();
+        });
+    }
+
+    private disconfigureOnHold(ally: Ally): void  {
+        ally.sprite.off('pointerdown');
     }
 }
