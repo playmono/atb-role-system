@@ -1,15 +1,7 @@
-import Character from "../Character";
 import CharacterBar from "../CharacterBar";
 
 export default class HealthBar extends CharacterBar {
     render(): void {
-        const position = this.character.sprite.getBottomCenter();
-        const offsetY = 5;
-
-		let healthBox = this.character.sprite.scene.add.graphics();
-		healthBox.fillStyle(0x0fff57, 0.8);
-		//healthBox.fillRect(position.x - CharacterBar.width / 2, position.y + offsetY, CharacterBar.width, CharacterBar.height);
-
         this.bar = this.character.sprite.scene.add.graphics();
         this.update();
     }

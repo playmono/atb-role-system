@@ -20,6 +20,7 @@ export default class Preloader extends Phaser.Scene {
 		}
 
 		this.load.spritesheet('tileset', 'tileset.png', { frameWidth: 32, frameHeight: 32});
+		this.load.image('levelup', 'level-up.png');
 
 		this.load.image('sword', 'scithersword.png');
 		this.load.image('bash', 'bash.png');

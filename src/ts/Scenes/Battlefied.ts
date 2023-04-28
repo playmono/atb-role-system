@@ -2,6 +2,8 @@ import { Columns, Rows } from "../Prefabs/Enums";
 import Hero from "../Prefabs/Characters/Ally";
 import Enemy from "../Prefabs/Characters/Enemy";
 import Utilities from "../Utilities";
+import AllyExperienceBar from "../Prefabs/ExperienceBars/AllyExperienceBar";
+import EnemyExperienceBar from "../Prefabs/ExperienceBars/EnemyExperienceBar";
 
 export default class Battlefield extends Phaser.Scene {
 	public static Name = "Battlefield";
@@ -51,6 +53,9 @@ export default class Battlefield extends Phaser.Scene {
 		const enemy4 = new Enemy();
 		enemy4.render(this, Columns.FOURTH_COLUMN);
 		Battlefield.enemyGroup.add(enemy4.sprite);
+
+		AllyExperienceBar.getExperienceBar().render(this);
+		EnemyExperienceBar.getExperienceBar().render(this);
 
 		this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
 			gameObject.x = dragX;

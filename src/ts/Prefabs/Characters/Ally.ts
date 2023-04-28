@@ -22,11 +22,13 @@ export default class Ally extends Character {
 
     startTurn(): void {
         this.sprite.setTint(0xfbff17);
+        this.renderSkills();
+        this.renderRoles();
+    }
 
-        // RENDER SKILLS
-
+    renderSkills() {
         let y = this.sprite.scene.cameras.main.centerY
-        let x = this.sprite.scene.cameras.main.centerX / 2;
+        let x = 50;
 
         this.currentRole.getAvailableSkills().forEach((skill) => {
             const skillType = skill[1];
@@ -34,11 +36,11 @@ export default class Ally extends Character {
             skillObject.render(this.sprite.scene, skillType, x, y);
             x = x + 50;
         });
+    }
 
-        // RENDER ROLES
-
-        y = this.sprite.scene.cameras.main.centerY + this.sprite.scene.cameras.main.centerY - 100;
-        x = this.sprite.scene.cameras.main.centerX - 50;
+    renderRoles() {
+        const y = this.sprite.scene.cameras.main.centerY;
+        let x = this.sprite.scene.cameras.main.centerX;
 
         if (this.level >= 2) {
             Object.values(this.roles).forEach((role) => {
@@ -54,14 +56,13 @@ export default class Ally extends Character {
         }
     }
 
-    holdTurn(): void {
+    public holdTurn(): void {
         Battlefield.turnElements.clear(true, true);
         this.sprite.setTint(0xa3e0ff);
     }
 
-    endTurn(): void {
+    public endTurn(): void {
         Battlefield.turnElements.clear(true, true);
-        this.levelUp();
         this.sprite.setTint(0xa3e0ff);
         this.atbBar.bar.destroy();
         this.atbBar.render();

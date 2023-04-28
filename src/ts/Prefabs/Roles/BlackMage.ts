@@ -9,7 +9,7 @@ import Ragnarok from "../Skills/Ragnarok";
 import SpiritualMind from "../Skills/SpiritualMind";
 import StoneCurse from "../Skills/StoneCurse";
 
-export default class BlackMage extends Role{
+export default class BlackMage extends Role  {
     static readonly roleName = RoleNames.BLACKMAGE;
     static readonly positionInSpreadsheet = 8;
     static readonly healthMultiplier = 2;

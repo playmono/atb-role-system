@@ -1,5 +1,6 @@
 import Battlefield from "../Scenes/Battlefied";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
+import AllyExperienceBar from "./ExperienceBars/AllyExperienceBar";
 import AllyQueue from "./Queues/AllyQueue";
 import Heal from "./Skills/Heal";
 
@@ -10,7 +11,7 @@ export default class Skill {
     static readonly effectRange: EffectRange;
     static readonly damageType: DamageType;
     static readonly areaOfEffect: AreaOfEffect;
-    static readonly damage: number = -30;
+    static readonly damage: number = -10;
 
     public applyEffect(): void {
         // To override
@@ -74,8 +75,6 @@ export default class Skill {
         const skill = skillSprite.__parentClass;
         const skillType = skillSprite.__typeOfParentClass;
 
-        const defense = Math.max(1, appliedOn);
-
         // DAMAGE FORMULA
         /*const damage = skillType.damageType === DamageType.Physical ?
             (character.attackPhysical - appliedOn.defensePhysical) * skillType.damage :
@@ -83,8 +82,8 @@ export default class Skill {
 
         */
 
-        targetSprite.emit('receiveSkill', skillType.damage);
-
+        appliedOn.receiveSkill(skillType.damage);
+        AllyExperienceBar.getExperienceBar().update(150);
         AllyQueue.getQueue().nextTurn();
     }
 

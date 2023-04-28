@@ -1,7 +1,7 @@
 import { RolesMap } from "./Constants";
 import { Columns, LanePosition, Rows } from "./Enums";
-import HealthBar from "./Bar/HealthBar";
-import AtbBar from "./Bar/AtbBar";
+import HealthBar from "./Bars/HealthBar";
+import AtbBar from "./Bars/AtbBar";
 import Role from "./Role";
 import Novice from "./Roles/Novice";
 
@@ -81,9 +81,6 @@ export default abstract class Character {
         // Novices in spritesheet is looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column > 1;
 
-        this.sprite.on('receiveSkill', this.onReceiveSkill, this);
-        this.sprite.on('die', this.onDie, this);
-
         this.levelsText = scene.add.text(
             this.sprite.getTopCenter().x - 10,
             this.sprite.getTopCenter().y - 30,
@@ -102,6 +99,7 @@ export default abstract class Character {
             this.currentRoleType.spriteFileName,
             this.currentRoleType.positionInSpreadsheet
         );
+        this.updateLevelsText();
     }
 
     protected updateLevelsText(): void {
@@ -114,11 +112,11 @@ export default abstract class Character {
         this.updateLevelsText();
     }
 
-    protected onReceiveSkill(damage: number): void {
+    protected receiveSkill(damage: number): void {
         let result = this.healthCurrent + damage;
 
         if (result <= 0) {
-            this.onDie();
+            this.die();
         }
 
         if (result > this.healthMax) {
@@ -129,7 +127,7 @@ export default abstract class Character {
         this.healthBar.update();
     }
 
-    protected onDie(): void {
+    protected die(): void {
         this.sprite.destroy();
         this.levelsText.destroy();
         this.atbBar.bar.destroy();
