@@ -6,7 +6,7 @@ export default class Enemy extends Character {
 
     render(scene: Phaser.Scene, column: Columns): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
         super.render(scene, column);
-        this.sprite.setTint(0xff8b87);
+        //this.sprite.setTint(0xff8b87);
 
         return this.sprite;
     }

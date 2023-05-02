@@ -2,7 +2,6 @@ import Battlefield from "../Scenes/Battlefied";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 import AllyExperienceBar from "./ExperienceBars/AllyExperienceBar";
 import AllyQueue from "./Queues/AllyQueue";
-import Heal from "./Skills/Heal";
 
 export default class Skill {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -83,11 +82,13 @@ export default class Skill {
         */
 
         appliedOn.receiveSkill(skillType.damage);
-        AllyExperienceBar.getExperienceBar().update(150);
+        //AllyExperienceBar.getExperienceBar().update(150);
         AllyQueue.getQueue().nextTurn();
+
+        character.levelUp();
     }
 
-    private onDragStop() {
+    private onDragStop(): void {
         this.configureOverlap();
     }
 }

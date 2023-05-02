@@ -9,9 +9,12 @@ import Protection from "../Skills/Protection";
 import Provoke from "../Skills/Provoke";
 import Ragnarok from "../Skills/Ragnarok";
 
-export default class Warrior extends Role {
-    static readonly roleName = RoleNames.WARRIOR;
-    static readonly positionInSpreadsheet = 0;
+export default class Swordman extends Role {
+    static readonly icon = 'swordman_icon';
+    static readonly roleName = RoleNames.SWORDMAN;
+    static readonly idleAnimation = 'swordman_idle';
+    static readonly spriteScale = 0.15;
+
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;
     static readonly magicalAttackMultiplier = 2;
@@ -29,7 +32,7 @@ export default class Warrior extends Role {
         [30, Ragnarok]*/
     ];
 
-    getAvailableSkills() {
-        return Warrior.skills.filter((skill) => skill[0] <= this.level);
+    public getAvailableSkills(): [number, typeof Skill][] {
+        return Swordman.skills.filter((skill) => skill[0] <= this.level);
     }
 }

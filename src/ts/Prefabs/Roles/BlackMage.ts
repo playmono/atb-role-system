@@ -11,7 +11,10 @@ import StoneCurse from "../Skills/StoneCurse";
 
 export default class BlackMage extends Role  {
     static readonly roleName = RoleNames.BLACKMAGE;
-    static readonly positionInSpreadsheet = 8;
+    static readonly icon = 'blackmage_icon';
+    static readonly idleAnimation = 'blackmage_idle';
+    static readonly spriteScale = 0.15;
+
     static readonly healthMultiplier = 2;
     static readonly physicalAttackMultiplier = 1;
     static readonly magicalAttackMultiplier = 5;
@@ -29,7 +32,7 @@ export default class BlackMage extends Role  {
         [30, Ragnarok]*/
     ];
 
-    getAvailableSkills() {
+    public getAvailableSkills(): [number, typeof Skill][] {
         return BlackMage.skills.filter((skill) => skill[0] <= this.level);
     }
 }

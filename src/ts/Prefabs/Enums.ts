@@ -1,7 +1,7 @@
 import Archer from "./Roles/Archer";
 import BlackMage from "./Roles/BlackMage";
 import Novice from "./Roles/Novice";
-import Warrior from "./Roles/Warrior";
+import Warrior from "./Roles/Swordman";
 import WhiteMage from "./Roles/WhiteMage";
 
 export enum AreaOfEffect {
@@ -27,7 +27,7 @@ export enum RoleNames {
     ARCHER,
     BLACKMAGE,
     NOVICE,
-    WARRIOR,
+    SWORDMAN,
     WHITE_MAGE
 };
 

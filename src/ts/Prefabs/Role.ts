@@ -1,13 +1,16 @@
 import Battlefield from "../Scenes/Battlefied";
+import Ally from "./Characters/Ally";
+import { RolesMap } from "./Constants";
 import { EffectRange, RoleNames } from "./Enums";
 import AllyQueue from "./Queues/AllyQueue";
 import Skill from "./Skill";
 
 export default abstract class Role {
     level: number = 1;
+    static readonly icon: string;
     static readonly roleName: RoleNames;
-    static readonly spriteFileName = "tileset";
-    static readonly positionInSpreadsheet: number;
+    static readonly idleAnimation: string;
+    static readonly spriteScale: number;
     static readonly healthMultiplier: number;
     static readonly physicalAttackMultiplier: number;
     static readonly magicalAttackMultiplier: number;
@@ -20,36 +23,38 @@ export default abstract class Role {
         return Role.skills.filter((skill) => skill[0] <= this.level);
     }
 
-    public render(scene: Phaser.Scene, roleType: typeof Role, x: number, y: number): void {
-        const sprite = scene.add.sprite(
+    public renderIcon(ally: Ally, role: Role, x: number, y: number): void {
+        const allyScene = ally.sprite.scene;
+        const roleType = Object.values(RolesMap).find((r) => role instanceof r);;
+
+        const sprite = allyScene.add.sprite(
             x,
             y,
-            roleType.spriteFileName,
-            roleType.positionInSpreadsheet
+            roleType.icon,
         ).setInteractive();
+
+        sprite.scale = 0.20;
 
         Battlefield.turnElements.add(sprite);
 
-        const currentAlly = AllyQueue.getQueue().getFirst();
-
-        if (currentAlly.currentRoleType === roleType) {
-            sprite.setTint(0x2b2b2b);
+        if (ally.currentRoleType === roleType) {
+            //sprite.setBlendMode(Phaser.BlendModes.LUMINOSITY);
         } else {
             sprite.on('pointerdown', (pointer) => {
-                const currentAlly = AllyQueue.getQueue().getFirst();
-                currentAlly.setRole(roleType);
-                currentAlly.renderRole(scene);
+                ally.setRole(roleType);
+                ally.renderRole(allyScene);
                 AllyQueue.getQueue().nextTurn();
             });
-
-            const text = scene.add.text(
-                sprite.getBottomCenter().x - 10,
-                sprite.getBottomCenter().y,
-                "Lv. " + this.level,
-                {fontSize: "10"}
-            );
-
-            Battlefield.turnElements.add(text);
         }
+
+        const text = allyScene.add.text(
+            sprite.getTopRight().x - 15,
+            sprite.getTopRight().y,
+            this.level.toString(),
+            {fontSize: "20px"}
+        );
+        text.setStroke('black', 5);
+
+        Battlefield.turnElements.add(text);
     }
 }

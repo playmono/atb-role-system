@@ -11,7 +11,10 @@ import SharpShoot from "../Skills/SharpShoot";
 
 export default class Archer extends Role {
     static readonly roleName = RoleNames.ARCHER;
-    static readonly positionInSpreadsheet = 4;
+    static readonly icon = 'archer_icon';
+    static readonly idleAnimation = 'archer_idle';
+    static readonly spriteScale = 0.25;
+
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;
     static readonly magicalAttackMultiplier = 2;
@@ -29,7 +32,7 @@ export default class Archer extends Role {
         [30, Ragnarok]*/
     ];
 
-    getAvailableSkills() {
+    public getAvailableSkills(): [number, typeof Skill][] {
         return Archer.skills.filter((skill) => skill[0] <= this.level);
     }
 }

@@ -4,9 +4,10 @@ import Skill from "../Skill";
 import Attack from "../Skills/Attack";
 
 export default class Novice extends Role {
-    static readonly spriteFileName = "tileset";
-    static readonly roleName = RoleNames.NOVICE;
-    static readonly positionInSpreadsheet = 13;
+    static readonly icon = 'novice_icon';
+    static readonly idleAnimation = 'swordman_idle';
+    static readonly spriteScale = 0.25;
+
     static readonly healthMultiplier = 1;
     static readonly physicalAttackMultiplier = 1;
     static readonly magicalAttackMultiplier = 1;
@@ -18,7 +19,7 @@ export default class Novice extends Role {
         [1, Attack]
     ];
 
-    getAvailableSkills() {
+    public getAvailableSkills(): [number, typeof Skill][] {
         return Novice.skills.filter((skill) => skill[0] <= this.level);
     }
 

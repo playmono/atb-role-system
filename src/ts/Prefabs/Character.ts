@@ -20,13 +20,16 @@ export default abstract class Character {
     defensePhysical: number = 4;
     defenseMagical: number = 2;
 
-    roles: Array<Role> = [];
+    private roles: Array<Role> = [];
 
     healthBar: HealthBar;
     atbBar: AtbBar;
     levelsText: Phaser.GameObjects.Text;
 
+    gender: number;
+
     constructor() {
+        this.gender = Math.random();
         this.healthBar = new HealthBar(this);
         this.atbBar = new AtbBar(this);
         this.setRole(Novice);
@@ -54,6 +57,10 @@ export default abstract class Character {
         return role;
     }
 
+    getRoles(): Array<Role> {
+        return this.roles;
+    }
+
     barReady() {
         // Do nothing
     }
@@ -69,16 +76,16 @@ export default abstract class Character {
         this.sprite = scene.physics.add.sprite(
             oneQuarterX * (column * 2 + 1),
             oneThirdY * (this.row * 3 + 1) + offsetY,
-            this.currentRoleType.spriteFileName,
-            this.currentRoleType.positionInSpreadsheet
+            ''
         ).setInteractive();
 
-        this.sprite['__parentClass'] = this;
-        this.sprite.body.setCircle(15, 15);
-        this.sprite.body.setOffset(0, 0);
-        this.sprite.scale = 2;
+        this.sprite.play(this.gender > 0.5 ? 'novice_boy_idle' : 'novice_girl_idle');
 
-        // Novices in spritesheet is looking in the other direction, so flip them if column < 2
+        this.sprite['__parentClass'] = this;
+        this.sprite.body.setSize(150, 370);
+        this.sprite.scale = 0.15;
+
+        // Novices in spritesheet are looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column > 1;
 
         this.levelsText = scene.add.text(
@@ -95,10 +102,9 @@ export default abstract class Character {
     }
 
     renderRole(scene: Phaser.Scene) {
-        this.sprite.setTexture(
-            this.currentRoleType.spriteFileName,
-            this.currentRoleType.positionInSpreadsheet
-        );
+        this.sprite.anims.play(this.currentRoleType.idleAnimation);
+        this.sprite.scale = this.currentRoleType.spriteScale;
+
         this.updateLevelsText();
     }
 
@@ -106,13 +112,21 @@ export default abstract class Character {
         this.levelsText.setText(this.level.toString() + "/" + this.currentRole.level.toString());
     }
 
-    protected levelUp(): void {
+    public levelUp(): void {
         this.level++;
         this.currentRole.level++;
         this.updateLevelsText();
     }
 
     protected receiveSkill(damage: number): void {
+        const anim = this.sprite.play(this.gender > 0.5 ? 'novice_boy_hurt' : 'novice_girl_hurt');
+
+        this.sprite.on(
+            Phaser.Animations.Events.ANIMATION_COMPLETE,
+            () => this.sprite.play(this.gender > 0.5 ? 'novice_boy_idle' : 'novice_girl_idle'),
+            this
+        );
+
         let result = this.healthCurrent + damage;
 
         if (result <= 0) {

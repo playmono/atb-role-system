@@ -8,7 +8,7 @@ export default class HealthBar extends CharacterBar {
 
     update(): void {
         const position = this.character.sprite.getBottomCenter();
-        const offsetY = 5;
+        const offsetY = 0;
         let width = CharacterBar.width * this.character.healthCurrent / this.character.healthMax;
 
         if (width < 0) {

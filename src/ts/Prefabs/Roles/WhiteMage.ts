@@ -10,8 +10,11 @@ import Resurrection from "../Skills/Resurrection";
 import Sanctuary from "../Skills/Sanctuary";
 
 export default class WhiteMage extends Role {
+    static readonly icon = 'whitemage_icon';
     static readonly roleName = RoleNames.WHITE_MAGE;
-    static readonly positionInSpreadsheet = 12;
+    static readonly idleAnimation = 'whitemage_idle';
+    static readonly spriteScale = 0.25;
+
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;
     static readonly magicalAttackMultiplier = 2;
@@ -29,7 +32,7 @@ export default class WhiteMage extends Role {
         [30, Ragnarok]*/
     ];
 
-    getAvailableSkills() {
+    getAvailableSkills(): [number, typeof Skill][] {
         return WhiteMage.skills.filter((skill) => skill[0] <= this.level);
     }
 }
