@@ -6,7 +6,7 @@
 ```bash
 cd download_folder
 npm install
-npm run start-dev
+npm run start:dev
 # Run `npm run` to check all the commands
 ```
 
