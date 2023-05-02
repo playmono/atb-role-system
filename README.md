@@ -1,4 +1,14 @@
-### Active Time Battle Role System
+# Active Time Battle Role System
+
+## Run dev mode
+1. Download the source code
+2. Execute the following commands
+```bash
+cd download_folder
+npm install
+npm run start-dev
+# Run `npm run` to check all the commands
+```
 
 ## Thanks to
 1. [Universitat Oberta de Catalunya](https://www.uoc.edu)
