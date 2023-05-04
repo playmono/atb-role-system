@@ -1,14 +1,20 @@
 import CharacterBar from "../CharacterBar";
+import { Rows } from "../Enums";
 
 export default class HealthBar extends CharacterBar {
     render(): void {
+        const oneThirdY = this.character.sprite.scene.cameras.main.width / 3;
+        const offsetY = this.character.row === Rows.BELOW_ROW ? 30 : 60;
+
+        this.x = this.character.sprite.getBottomCenter().x - CharacterBar.width / 2;
+        this.y = oneThirdY * (this.character.row * 3 + 1) + offsetY;
+
         this.bar = this.character.sprite.scene.add.graphics();
         this.update();
     }
 
     update(): void {
-        const position = this.character.sprite.getBottomCenter();
-        const offsetY = 0;
+        console.log(this.character.sprite.getBottomCenter());
         let width = CharacterBar.width * this.character.healthCurrent / this.character.healthMax;
 
         if (width < 0) {
@@ -21,7 +27,7 @@ export default class HealthBar extends CharacterBar {
 
         this.bar.clear();
         this.bar.fillStyle(this.getColor(width), 1);
-        this.bar.fillRect(position.x - CharacterBar.width / 2, position.y + offsetY, width, CharacterBar.height);
+        this.bar.fillRect(this.x, this.y, width, CharacterBar.height);
     }
 
     private getColor(width: number): number {

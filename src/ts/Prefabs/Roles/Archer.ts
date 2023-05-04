@@ -14,6 +14,7 @@ export default class Archer extends Role {
     static readonly icon = 'archer_icon';
     static readonly idleAnimation = 'archer_idle';
     static readonly spriteScale = 0.25;
+    static readonly spriteOffsetY = 7;
 
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;

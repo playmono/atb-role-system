@@ -68,42 +68,46 @@ export default abstract class Character {
     render(scene: Phaser.Scene, column: Columns): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
         this.column = column;
 
-        const oneQuarterX = scene.cameras.main.width / 8;
-        const oneThirdY = scene.cameras.main.width / 3;
-
-        const offsetY = this.row === Rows.BELOW_ROW ? -30 : 0;
-
-        this.sprite = scene.physics.add.sprite(
-            oneQuarterX * (column * 2 + 1),
-            oneThirdY * (this.row * 3 + 1) + offsetY,
-            ''
-        ).setInteractive();
-
-        this.sprite.play(this.gender > 0.5 ? 'novice_boy_idle' : 'novice_girl_idle');
-
-        this.sprite['__parentClass'] = this;
-        this.sprite.body.setSize(150, 370);
-        this.sprite.scale = 0.15;
+        this.sprite = scene.physics.add.sprite(0, 0, '')
+            .setOrigin(0.5)
+            .setInteractive();
 
         // Novices in spritesheet are looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column > 1;
+
+        this.sprite['__parentClass'] = this;
+        this.sprite.body.setSize(150, 370);
 
         this.levelsText = scene.add.text(
             this.sprite.getTopCenter().x - 10,
             this.sprite.getTopCenter().y - 30,
             ''
         );
-        this.updateLevelsText();
 
+        this.renderRole(scene);
         this.healthBar.render();
         this.atbBar.render();
+
+        this.updateLevelsText();
 
         return this.sprite;
     }
 
     renderRole(scene: Phaser.Scene) {
-        this.sprite.anims.play(this.currentRoleType.idleAnimation);
+        const idleAnimation = this.currentRoleType === Novice ?
+            this.gender > 0.5 ? 'novice_boy_idle' : 'novice_girl_idle'
+            : this.currentRoleType.idleAnimation;
+
+        this.sprite.anims.play(idleAnimation);
         this.sprite.scale = this.currentRoleType.spriteScale;
+
+        const oneThirdY = scene.cameras.main.width / 3;
+        const oneQuarterX = scene.cameras.main.width / 8;
+
+        const offsetY = this.row === Rows.BELOW_ROW ? -30 : 0;
+
+        this.sprite.x = oneQuarterX * (this.column * 2 + 1);
+        this.sprite.y = oneThirdY * (this.row * 3 + 1) + offsetY + this.currentRoleType.spriteOffsetY;
 
         this.updateLevelsText();
     }

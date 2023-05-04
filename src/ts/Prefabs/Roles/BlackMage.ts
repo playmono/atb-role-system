@@ -14,6 +14,7 @@ export default class BlackMage extends Role  {
     static readonly icon = 'blackmage_icon';
     static readonly idleAnimation = 'blackmage_idle';
     static readonly spriteScale = 0.15;
+    static readonly spriteOffsetY = 0;
 
     static readonly healthMultiplier = 2;
     static readonly physicalAttackMultiplier = 1;

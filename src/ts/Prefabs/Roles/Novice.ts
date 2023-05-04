@@ -5,8 +5,9 @@ import Attack from "../Skills/Attack";
 
 export default class Novice extends Role {
     static readonly icon = 'novice_icon';
-    static readonly idleAnimation = 'swordman_idle';
-    static readonly spriteScale = 0.25;
+    static readonly idleAnimation = 'novice_idle';
+    static readonly spriteScale = 0.15;
+    static readonly spriteOffsetY = 0;
 
     static readonly healthMultiplier = 1;
     static readonly physicalAttackMultiplier = 1;

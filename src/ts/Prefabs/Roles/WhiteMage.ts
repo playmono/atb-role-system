@@ -14,6 +14,7 @@ export default class WhiteMage extends Role {
     static readonly roleName = RoleNames.WHITE_MAGE;
     static readonly idleAnimation = 'whitemage_idle';
     static readonly spriteScale = 0.25;
+    static readonly spriteOffsetY = 4;
 
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;

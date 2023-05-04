@@ -14,6 +14,7 @@ export default class Swordman extends Role {
     static readonly roleName = RoleNames.SWORDMAN;
     static readonly idleAnimation = 'swordman_idle';
     static readonly spriteScale = 0.15;
+    static readonly spriteOffsetY = 0;
 
     static readonly healthMultiplier = 3;
     static readonly physicalAttackMultiplier = 4;

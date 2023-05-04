@@ -11,6 +11,7 @@ export default abstract class Role {
     static readonly roleName: RoleNames;
     static readonly idleAnimation: string;
     static readonly spriteScale: number;
+    static readonly spriteOffsetY: number;
     static readonly healthMultiplier: number;
     static readonly physicalAttackMultiplier: number;
     static readonly magicalAttackMultiplier: number;
@@ -48,7 +49,7 @@ export default abstract class Role {
         }
 
         const text = allyScene.add.text(
-            sprite.getTopRight().x - 15,
+            sprite.getTopRight().x - 18,
             sprite.getTopRight().y,
             this.level.toString(),
             {fontSize: "20px"}
