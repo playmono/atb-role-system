@@ -24,7 +24,7 @@ export default class WhiteMage extends Role {
     static readonly effectRange = EffectRange.One;
 
     static readonly skills: [number, typeof Skill][] = [
-        [1, Attack],
+        //[1, Attack],
         [2, Heal],
         /*[5, Cure],
         [10, Blessing],

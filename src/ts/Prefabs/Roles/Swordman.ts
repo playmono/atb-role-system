@@ -24,7 +24,7 @@ export default class Swordman extends Role {
     static readonly effectRange = EffectRange.One;
 
     static readonly skills: [number, typeof Skill][] = [
-        [1, Attack],
+        //[1, Attack],
         [2, Bash],
         /*[5, Provoke],
         [10, Protection],

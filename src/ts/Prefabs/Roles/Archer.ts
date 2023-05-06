@@ -24,7 +24,7 @@ export default class Archer extends Role {
     static readonly effectRange = EffectRange.Two;
 
     static readonly skills: [number, typeof Skill][] = [
-        [1, Attack],
+        //[1, Attack],
         [2, FireArrow],
         /*[5, Concentration],
         [10, AnkleTrap],

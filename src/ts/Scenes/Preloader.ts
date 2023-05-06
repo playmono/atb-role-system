@@ -119,7 +119,8 @@ export default class Preloader extends Phaser.Scene {
     }
 
     private loadNovice(): void {
-        this.load.image('novice_icon', 'gray_11.png');
+        this.load.image('novice_icon', 'role_icons/novice.png');
+        this.load.image('attack_icon', 'skills/attack.png');
 
         this.load.atlas('novice_boy_idle', 'roles/Novice/Boy/Idle/spritesheet.png', 'roles/Novice/Boy/Idle/spritesheet.json');
         this.load.atlas('novice_boy_hurt', 'roles/Novice/Boy/Hurt/spritesheet.png', 'roles/Novice/Boy/Hurt/spritesheet.json');
@@ -129,24 +130,24 @@ export default class Preloader extends Phaser.Scene {
     }
 
     private loadArcher(): void {
-        this.load.image('archer_icon', 'blue_16.png');
+        this.load.image('archer_icon', 'role_icons/archer.png');
 
         this.load.atlas('archer_idle', 'roles/Archer/Idle/spritesheet.png', 'roles/Archer/Idle/spritesheet.json');
     }
 
     private loadBlackMage(): void {
-        this.load.image('blackmage_icon', 'violet_08.PNG');
+        this.load.image('blackmage_icon', 'role_icons/blackmage.png');
 
         this.load.atlas('blackmage_idle', 'roles/BlackMage/Idle/spritesheet.png', 'roles/BlackMage/Idle/spritesheet.json');
     }
 
     private loadSwordman(): void {
-        this.load.image('swordman_icon', 'yellow_18.PNG');
+        this.load.image('swordman_icon', 'role_icons/swordman.png');
         this.load.atlas('swordman_idle', 'roles/Swordman/Idle/spritesheet.png', 'roles/Swordman/Idle/spritesheet.json');
     }
 
     private loadWhiteMage(): void {
-        this.load.image('whitemage_icon', 'green_20.PNG');
+        this.load.image('whitemage_icon', 'role_icons/whitemage.png');
 
         this.load.atlas('whitemage_idle', 'roles/WhiteMage/Idle/spritesheet.png', 'roles/WhiteMage/Idle/spritesheet.json');
     }

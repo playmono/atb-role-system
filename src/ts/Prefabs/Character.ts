@@ -25,8 +25,8 @@ export default abstract class Character {
     healthBar: HealthBar;
     atbBar: AtbBar;
     levelsText: Phaser.GameObjects.Text;
-
     gender: number;
+    roleIcon: Phaser.GameObjects.Sprite;
 
     constructor() {
         this.gender = Math.random();
@@ -108,6 +108,17 @@ export default abstract class Character {
 
         this.sprite.x = oneQuarterX * (this.column * 2 + 1);
         this.sprite.y = oneThirdY * (this.row * 3 + 1) + offsetY + this.currentRoleType.spriteOffsetY;
+
+        if (this.roleIcon === undefined) {
+            this.roleIcon = this.currentRole.renderIcon(
+                this,
+                this.currentRole,
+                this.sprite.getTopCenter().x,
+                this.sprite.getTopCenter().y + 5
+            );
+        } else {
+            this.roleIcon.setTexture(this.currentRoleType.icon);
+        }
 
         this.updateLevelsText();
     }

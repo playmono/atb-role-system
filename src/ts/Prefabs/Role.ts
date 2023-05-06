@@ -1,4 +1,5 @@
 import Battlefield from "../Scenes/Battlefied";
+import Character from "./Character";
 import Ally from "./Characters/Ally";
 import { RolesMap } from "./Constants";
 import { EffectRange, RoleNames } from "./Enums";
@@ -24,9 +25,9 @@ export default abstract class Role {
         return Role.skills.filter((skill) => skill[0] <= this.level);
     }
 
-    public renderIcon(ally: Ally, role: Role, x: number, y: number): void {
-        const allyScene = ally.sprite.scene;
-        const roleType = Object.values(RolesMap).find((r) => role instanceof r);;
+    public renderIcon(character: Character, role: Role, x: number, y: number, turnElements?: Phaser.GameObjects.Group): Phaser.GameObjects.Sprite {
+        const allyScene = character.sprite.scene;
+        const roleType = Object.values(RolesMap).find((r) => role instanceof r);
 
         const sprite = allyScene.add.sprite(
             x,
@@ -34,28 +35,32 @@ export default abstract class Role {
             roleType.icon,
         ).setInteractive();
 
-        sprite.scale = 0.20;
+        sprite.scale = 0.10;
 
         Battlefield.turnElements.add(sprite);
 
-        if (ally.currentRoleType === roleType) {
-            //sprite.setBlendMode(Phaser.BlendModes.LUMINOSITY);
-        } else {
-            sprite.on('pointerdown', (pointer) => {
-                ally.setRole(roleType);
-                ally.renderRole(allyScene);
-                AllyQueue.getQueue().nextTurn();
-            });
-        }
+        const graphics = sprite.scene.make.graphics({});
+
+        graphics.fillStyle(0xffffff);
+        graphics.fillCircle(sprite.x, sprite.y, 12);
+
+        const mask = graphics.createGeometryMask();
+
+        sprite.setMask(mask);
 
         const text = allyScene.add.text(
-            sprite.getTopRight().x - 18,
-            sprite.getTopRight().y,
+            sprite.getTopRight().x - 10,
+            sprite.getTopRight().y - 5,
             this.level.toString(),
-            {fontSize: "20px"}
+            {fontSize: "12px"}
         );
         text.setStroke('black', 5);
 
-        Battlefield.turnElements.add(text);
+        if (turnElements) {
+            turnElements.add(sprite);
+            turnElements.add(text);
+        }
+
+        return sprite;
     }
 }

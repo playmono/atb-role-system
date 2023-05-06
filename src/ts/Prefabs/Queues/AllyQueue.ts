@@ -50,7 +50,7 @@ export default class AllyQueue extends Queue<Ally> {
 
     private configureOnHold(ally: Ally): void {
         ally.sprite.on('pointerdown', (pointer) => {
-            this.getFirst().holdTurn();
+            //this.getFirst().holdTurn();
             this.configureOnHold(this.getFirst());
             this.putFirst(ally);
             this.getFirst().startTurn();
