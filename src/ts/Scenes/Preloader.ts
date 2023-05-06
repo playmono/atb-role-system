@@ -28,7 +28,8 @@ export default class Preloader extends Phaser.Scene {
         this.load.image('firebolt', 'firebolt.png');
         this.load.image('heal', 'heal.png');
 
-        this.loadGUI();
+        this.loadSfx();
+        this.loadVfx();
         this.loadArcher();
         this.loadBlackMage();
         this.loadNovice();
@@ -114,8 +115,12 @@ export default class Preloader extends Phaser.Scene {
         });
     }
 
-    private loadGUI(): void {
-        this.load.image('text_background', 'bt.png');
+    private loadSfx(): void {
+        this.load.audio('changerole', 'sfx/changejob.mp3');
+    }
+
+    private loadVfx(): void {
+        this.load.atlas('radar', 'effects/radar/spritesheet.png', 'effects/radar/spritesheet.json');
     }
 
     private loadNovice(): void {

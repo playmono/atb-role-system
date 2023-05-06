@@ -12,6 +12,8 @@ export default class Battlefield extends Phaser.Scene {
     static turnElements: Phaser.GameObjects.Group;
 
     public preload(): void {
+        this.loadSfx();
+        this.loadOtherAnimations();
         this.loadNoviceAnimations();
         this.loadArcherAnimations();
         this.loadBlackMageAnimations();
@@ -69,6 +71,25 @@ export default class Battlefield extends Phaser.Scene {
         this.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
             gameObject.x = gameObject.__initialX;
             gameObject.y = gameObject.__initialY;
+        });
+    }
+
+    private loadSfx(): void {
+        this.sound.add('changerole');
+    }
+
+    private loadOtherAnimations(): void {
+        this.anims.create({
+            key: 'radar',
+            frames: this.anims.generateFrameNames('radar', {
+                start: 0,
+                end: 12,
+                zeroPad: 2,
+                prefix: '',
+                suffix: '.png'
+            }),
+            frameRate: 36,
+            repeat: 0
         });
     }
 

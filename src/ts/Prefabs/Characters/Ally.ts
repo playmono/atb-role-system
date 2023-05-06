@@ -56,11 +56,29 @@ export default class Ally extends Character {
 
             const roleType = Object.values(RolesMap).find((r) => otherRoles[i] instanceof r);
 
+            let radar = null;
+
             icon.on('pointerdown', (pointer) => {
-                this.setRole(roleType);
-                this.renderRole(this.sprite.scene);
-                this.endTurn();
+                radar = this.sprite.scene.add.sprite(
+                    this.sprite.getCenter().x,
+                    this.sprite.getCenter().y,
+                    '',
+                );
+                radar.scale = 0.3;
+                radar.anims.play('radar');
+
+                radar.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+                    this.sprite.scene.sound.play('changerole');
+                    this.setRole(roleType);
+                    this.renderRole(this.sprite.scene);
+                    this.endTurn();
+                    radar.destroy();
+                });
             });
+
+            icon.on('pointerup', (pointer) => {
+                radar.destroy();
+            })
 
             if (i % 2 !== 0) {
                 offsetY += 35;
