@@ -24,12 +24,12 @@ export default class BlackMage extends Role  {
     static readonly effectRange = EffectRange.One;
 
     static readonly skills: [number, typeof Skill][] = [
-        //[1, Attack],
-        [2, FireBolt],
-        /*[5, StoneCurse],
+        [1, Attack],
+        [1, FireBolt],
+        [5, StoneCurse],
         [10, SpiritualMind],
-        [15, LordOfVermillion],
-        [20, MedusaGlance],
+        [15, LordOfVermillion]
+        /*[20, MedusaGlance],
         [30, Ragnarok]*/
     ];
 

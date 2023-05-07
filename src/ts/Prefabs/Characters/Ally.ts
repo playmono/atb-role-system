@@ -4,6 +4,7 @@ import { RolesMap } from "../Constants";
 import { Rows, Columns } from "../Enums";
 import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
+import Archer from "../Roles/Archer";
 import Novice from "../Roles/Novice";
 
 export default class Ally extends Character {
@@ -23,20 +24,27 @@ export default class Ally extends Character {
     }
 
     renderSkills(): void {
-        let x = this.sprite.getTopCenter().x;
-        let y = this.sprite.getTopCenter().y - 30;
+        let angle = - Math.PI / 2;
 
-        this.currentRole.getAvailableSkills().forEach((skill) => {
-            const skillType = skill[1];
-            const skillObject = new skillType();
-            const sprite = skillObject.render(this.sprite.scene, skillType, x, y);
+        const skills = this.currentRoleType.skills;
+
+        for (let i = 0; i < skills.length; i++) {
+            const skillLevel = skills[i][0];
+            const skillType = skills[i][1];
+            const skillObject = new skillType(this);
+
+            const difference = i * Math.PI * 1.15 / 4;
+            angle = i % 2 === 0 ? angle += difference : angle -= difference;
+            const circumferencePoint = Phaser.Geom.Circle.CircumferencePoint(this.topCircle, angle);
+            const sprite = skillObject.render(skillType, skillLevel, circumferencePoint.x, circumferencePoint.y);
+
             this.turnElements.add(sprite);
-            x = x + 50;
-        });
+        }
     }
 
     renderRoleIcons(): void {
-        const y = this.sprite.getBottomCenter().y + 35;
+        const offsetCircle = this.currentRoleType == Archer ? 45 : 35;
+        const y = this.sprite.getBottomCenter().y + offsetCircle;
         const x = this.sprite.getBottomCenter().x - 25;
 
         const otherRoles = this.getRoles().filter(
@@ -70,6 +78,8 @@ export default class Ally extends Character {
 
                 radar.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
                     this.sprite.scene.sound.play('changerole');
+                    this.roleIcon.destroy();
+                    this.currentRole.text.destroy();
                     this.setRole(roleType);
                     this.renderRole(this.sprite.scene);
                     this.endTurn();
@@ -89,7 +99,10 @@ export default class Ally extends Character {
 
     startTurn(): void {
         this.renderSkills();
-        this.renderRoleIcons();
+
+        if (this.level > 1) {
+            this.renderRoleIcons();
+        }
     }
 
     public endTurn(): void {

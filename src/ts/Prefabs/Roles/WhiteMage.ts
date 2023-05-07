@@ -3,7 +3,7 @@ import Role from "../Role";
 import Skill from "../Skill";
 import Attack from "../Skills/Attack";
 import Blessing from "../Skills/Blessing";
-import Cure from "../Skills/Cure";
+import Dispel from "../Skills/Dispel";
 import Heal from "../Skills/Heal";
 import Ragnarok from "../Skills/Ragnarok";
 import Resurrection from "../Skills/Resurrection";
@@ -24,12 +24,12 @@ export default class WhiteMage extends Role {
     static readonly effectRange = EffectRange.One;
 
     static readonly skills: [number, typeof Skill][] = [
-        //[1, Attack],
-        [2, Heal],
-        /*[5, Cure],
+        [1, Attack],
+        [1, Heal],
+        [5, Dispel],
         [10, Blessing],
         [15, Resurrection],
-        [20, Sanctuary],
+        /*[20, Sanctuary],
         [30, Ragnarok]*/
     ];
 

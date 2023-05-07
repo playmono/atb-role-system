@@ -8,8 +8,9 @@ import Skill from "./Skill";
 
 export default abstract class Role {
     level: number = 1;
+    text: Phaser.GameObjects.Text;
+
     static readonly icon: string;
-    
     static readonly idleAnimation: string;
     static readonly spriteScale: number;
     static readonly spriteOffsetY: number;
@@ -25,19 +26,25 @@ export default abstract class Role {
         return Role.skills.filter((skill) => skill[0] <= this.level);
     }
 
-    public renderIcon(character: Character, role: Role, x: number, y: number, turnElements?: Phaser.GameObjects.Group): Phaser.GameObjects.Sprite {
+    public renderIcon(
+        character: Character,
+        role: Role,
+        x: number,
+        y: number,
+        turnElements?: Phaser.GameObjects.Group
+    ): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
         const allyScene = character.sprite.scene;
         const roleType = Object.values(RolesMap).find((r) => role instanceof r);
 
-        const sprite = allyScene.add.sprite(
+        const sprite = allyScene.physics.add.sprite(
             x,
             y,
             roleType.icon,
-        ).setInteractive();
-
-        sprite.scale = 0.15;
-
-        Battlefield.turnElements.add(sprite);
+        )
+        .setInteractive()
+        .setScale(0.15)
+        .setCircle(100)
+        .setOffset(25, 25);
 
         const graphics = sprite.scene.make.graphics({});
 
@@ -48,19 +55,30 @@ export default abstract class Role {
 
         sprite.setMask(mask);
 
-        const text = allyScene.add.text(
+        this.text = allyScene.add.text(
             sprite.getTopRight().x - 15,
             sprite.getTopRight().y,
-            this.level.toString(),
+            '',
             {fontSize: "16px"}
         );
-        text.setStroke('black', 5);
+        this.text.setStroke('black', 5);
 
         if (turnElements) {
             turnElements.add(sprite);
-            turnElements.add(text);
+            turnElements.add(this.text);
         }
 
+        this.updateText();
+
         return sprite;
+    }
+
+    public levelUp(): void {
+        this.level++;
+        this.updateText();
+    }
+
+    public updateText(): void {
+        this.text.setText(this.level.toString());
     }
 }

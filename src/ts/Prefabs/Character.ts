@@ -4,6 +4,7 @@ import HealthBar from "./Bars/HealthBar";
 import AtbBar from "./Bars/AtbBar";
 import Role from "./Role";
 import Novice from "./Roles/Novice";
+import Archer from "./Roles/Archer";
 
 export default abstract class Character {
     level: number = 1;
@@ -26,7 +27,9 @@ export default abstract class Character {
     atbBar: AtbBar;
     levelsText: Phaser.GameObjects.Text;
     gender: number;
-    roleIcon: Phaser.GameObjects.Sprite;
+    topCircle: Phaser.Geom.Circle;
+
+    roleIcon: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
     constructor() {
         this.gender = Math.random();
@@ -72,23 +75,16 @@ export default abstract class Character {
             .setOrigin(0.5)
             .setInteractive();
 
+            this.sprite.body.setSize(100, 300);
+
         // Novices in spritesheet are looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column > 1;
 
         this.sprite['__parentClass'] = this;
-        this.sprite.body.setSize(150, 370);
-
-        this.levelsText = scene.add.text(
-            this.sprite.getTopCenter().x - 10,
-            this.sprite.getTopCenter().y - 30,
-            ''
-        );
 
         this.renderRole(scene);
         this.healthBar.render();
         this.atbBar.render();
-
-        this.updateLevelsText();
 
         return this.sprite;
     }
@@ -101,6 +97,8 @@ export default abstract class Character {
         this.sprite.anims.play(idleAnimation);
         this.sprite.scale = this.currentRoleType.spriteScale;
 
+        this.sprite.body.setSize(100, 300);
+
         const oneThirdY = scene.cameras.main.width / 3;
         const oneQuarterX = scene.cameras.main.width / 6;
 
@@ -109,28 +107,28 @@ export default abstract class Character {
         this.sprite.x = oneQuarterX * (this.column * 2 + 1);
         this.sprite.y = oneThirdY * (this.row * 3 + 1) + offsetY + this.currentRoleType.spriteOffsetY;
 
-        if (this.roleIcon === undefined) {
-            this.roleIcon = this.currentRole.renderIcon(
-                this,
-                this.currentRole,
-                this.sprite.getTopCenter().x,
-                this.sprite.getTopCenter().y + 10
-            );
-        } else {
-            this.roleIcon.setTexture(this.currentRoleType.icon);
+        const offsetCircle = this.currentRoleType == Archer ? -15 : 10;
+
+        this.topCircle = new Phaser.Geom.Circle(this.sprite.getTopCenter().x, this.sprite.getTopCenter().y + offsetCircle, 40);
+        const graphics = this.sprite.scene.add.graphics({ lineStyle: { color: 0x00ff00 } });
+        //graphics.strokeCircleShape(this.topCircle);
+
+        if (this.roleIcon !== undefined) {
+            //this.roleIcon.destroy();
+            //this.roleIcon.text
         }
 
-        this.updateLevelsText();
-    }
-
-    protected updateLevelsText(): void {
-        this.levelsText.setText(this.level.toString() + "/" + this.currentRole.level.toString());
+        this.roleIcon = this.currentRole.renderIcon(
+            this,
+            this.currentRole,
+            this.topCircle.x,
+            this.topCircle.y
+        );
     }
 
     public levelUp(): void {
         this.level++;
-        this.currentRole.level++;
-        this.updateLevelsText();
+        this.currentRole.levelUp();
     }
 
     protected receiveSkill(damage: number): void {
@@ -157,8 +155,9 @@ export default abstract class Character {
     }
 
     protected die(): void {
+        this.roleIcon.destroy();
+        this.currentRole.text.destroy();
         this.sprite.destroy();
-        this.levelsText.destroy();
         this.atbBar.bar.destroy();
         this.atbBar.progressBox.destroy();
         this.healthBar.bar.destroy();

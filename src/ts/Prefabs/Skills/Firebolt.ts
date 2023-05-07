@@ -2,7 +2,7 @@ import { AreaOfEffect, DamageType, EffectRange } from "../Enums";
 import Skill from "../Skill";
 
 export default class FireBolt extends Skill {
-    static readonly spriteName = "firebolt";
+    static readonly spriteName = "fire_bolt";
     static readonly effectRange = EffectRange.Two;
     static readonly damageType = DamageType.Magical;
     static readonly areaOfEffect = AreaOfEffect.Single;

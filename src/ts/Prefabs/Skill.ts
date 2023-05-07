@@ -1,10 +1,11 @@
 import Battlefield from "../Scenes/Battlefied";
+import Ally from "./Characters/Ally";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 import AllyExperienceBar from "./ExperienceBars/AllyExperienceBar";
 import AllyQueue from "./Queues/AllyQueue";
 
 export default class Skill {
-    container: Phaser.GameObjects.Container;
+    ally: Ally;
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     mask: Phaser.Display.Masks.GeometryMask;
 
@@ -15,9 +16,11 @@ export default class Skill {
     static readonly areaOfEffect: AreaOfEffect;
     static readonly damage: number = -10;
 
+    static readonly skills: [number, typeof Skill][];
+
     static readonly initialValues = {
-        scale: 0.10,
-        radius: 10
+        scale: 0.15,
+        radius: 15
     };
 
     static readonly dragValues = {
@@ -25,40 +28,52 @@ export default class Skill {
         radius: 30
     };
 
+    public constructor(ally: Ally) {
+        this.ally = ally;
+    }
+
     public applyEffect(): void {
         // To override
     }
 
-    public render(scene: Phaser.Scene, skillType: typeof Skill, x: number, y: number): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
-        this.sprite = scene.physics.add.sprite(
-            0,
-            0,
+    public render(skillType: typeof Skill, skillLevel: number, x: number, y: number): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
+        // CAREFUL: this.ally.sprite maybe doesnt exist
+        this.sprite = this.ally.sprite.scene.physics.add.sprite(
+            x,
+            y,
             skillType.spriteName
-        );
-        this.sprite.scale = Skill.initialValues.scale;
+        )
+        .setScale(0.15)
+        .setCircle(100)
+        .setOffset(25, 25)
+        .setScale(Skill.initialValues.scale);
+
         this.sprite['__parentClass'] = this;
         this.sprite['__typeOfParentClass'] = skillType;
 
-        this.container = scene.add.container(x, y, [this.sprite] );
-        this.container.setSize(80, 80);
-        this.container.setInteractive({ draggable: true });
+        this.sprite['__initialX'] = x;
+        this.sprite['__initialY'] = y;
 
-        this.container['__initialX'] = x;
-        this.container['__initialY'] = y;
+        Battlefield.turnElements.add(this.sprite);
 
-        Battlefield.turnElements.add(this.container);
-
-        //this.configureOverlap();
+        this.configureOverlap();
 
         const circle = this.sprite.scene.make.graphics({})
         circle.fillStyle(0xffffff);
-        circle.fillCircle(this.container.x, this.container.y, Skill.initialValues.radius);
+        circle.fillCircle(this.sprite.x, this.sprite.y, Skill.initialValues.radius);
         this.mask = circle.createGeometryMask();
-        this.container.setMask(this.mask);
+        this.sprite.setMask(this.mask);
 
-        scene.input.setDraggable(this.container);
-        this.container.addListener('drag', this.isDragging, this);
-        this.container.addListener('dragend', this.onDragStop, this);
+        Battlefield.turnElements.add(circle);
+
+        if (skillLevel > this.ally.currentRole.level) {
+            this.sprite.setAlpha(0.2);
+        } else {
+            this.sprite.setInteractive({ draggable: true });
+            this.sprite.scene.input.setDraggable(this.sprite);
+            this.sprite.addListener('drag', this.isDragging, this);
+            this.sprite.addListener('dragend', this.onDragStop, this);
+        }
 
         return this.sprite;
     }
@@ -87,7 +102,6 @@ export default class Skill {
         skillSprite: any,
         targetSprite: any
     ): void {
-        const character = AllyQueue.getQueue().getFirst();
         const appliedOn = targetSprite.__parentClass;
         const skill = skillSprite.__parentClass;
         const skillType = skillSprite.__typeOfParentClass;
@@ -98,18 +112,16 @@ export default class Skill {
             (character.attackMagical - appliedOn.defenseMagical) * skillType.damage;
 
         */
-        /*
+
         appliedOn.receiveSkill(skillType.damage);
         //AllyExperienceBar.getExperienceBar().update(150);
-        AllyQueue.getQueue().nextTurn();
-
-        character.levelUp();
-        */
+        this.ally.levelUp();
+        this.ally.endTurn();
     }
 
     private isDragging(pointer: Phaser.Input.Pointer, dragX: number, dragY: number): void {
         this.mask.geometryMask.clear();
-        this.mask.geometryMask.fillCircle(this.container.x, this.container.y, Skill.dragValues.radius);
+        this.mask.geometryMask.fillCircle(this.sprite.x, this.sprite.y, Skill.dragValues.radius);
         this.sprite.scale = Skill.dragValues.scale;
 
     }
@@ -117,7 +129,7 @@ export default class Skill {
     private onDragStop(): void {
         this.configureOverlap();
         this.mask.geometryMask.clear();
-        this.mask.geometryMask.fillCircle(this.container['__initialX'], this.container['__initialY'], Skill.initialValues.radius);
+        this.mask.geometryMask.fillCircle(this.sprite['__initialX'], this.sprite['__initialY'], Skill.initialValues.radius);
         this.sprite.scale = Skill.initialValues.scale;
     }
 }
