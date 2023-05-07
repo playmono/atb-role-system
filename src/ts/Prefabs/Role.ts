@@ -9,7 +9,7 @@ import Skill from "./Skill";
 export default abstract class Role {
     level: number = 1;
     static readonly icon: string;
-    static readonly roleName: RoleNames;
+    
     static readonly idleAnimation: string;
     static readonly spriteScale: number;
     static readonly spriteOffsetY: number;
@@ -35,24 +35,24 @@ export default abstract class Role {
             roleType.icon,
         ).setInteractive();
 
-        sprite.scale = 0.10;
+        sprite.scale = 0.15;
 
         Battlefield.turnElements.add(sprite);
 
         const graphics = sprite.scene.make.graphics({});
 
         graphics.fillStyle(0xffffff);
-        graphics.fillCircle(sprite.x, sprite.y, 12);
+        graphics.fillCircle(sprite.x, sprite.y, 15);
 
         const mask = graphics.createGeometryMask();
 
         sprite.setMask(mask);
 
         const text = allyScene.add.text(
-            sprite.getTopRight().x - 10,
-            sprite.getTopRight().y - 5,
+            sprite.getTopRight().x - 15,
+            sprite.getTopRight().y,
             this.level.toString(),
-            {fontSize: "12px"}
+            {fontSize: "16px"}
         );
         text.setStroke('black', 5);
 

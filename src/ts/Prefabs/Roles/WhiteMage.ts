@@ -11,7 +11,7 @@ import Sanctuary from "../Skills/Sanctuary";
 
 export default class WhiteMage extends Role {
     static readonly icon = 'whitemage_icon';
-    static readonly roleName = RoleNames.WHITE_MAGE;
+    static readonly hexColor = 0x0afc00;
     static readonly idleAnimation = 'whitemage_idle';
     static readonly spriteScale = 0.25;
     static readonly spriteOffsetY = 4;

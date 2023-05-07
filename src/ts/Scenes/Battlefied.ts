@@ -39,11 +39,11 @@ export default class Battlefield extends Phaser.Scene {
         const hero3 = new Hero();
         hero3.render(this, Columns.THIRD_COLUMN);
         Battlefield.allyGroup.add(hero3.sprite);
-
+        /*
         const hero4 = new Hero();
         hero4.render(this, Columns.FOURTH_COLUMN);
         Battlefield.allyGroup.add(hero4.sprite);
-
+        */
         const enemy1 = new Enemy();
         enemy1.render(this, Columns.FIRST_COLUMN);
         Battlefield.enemyGroup.add(enemy1.sprite);
@@ -55,11 +55,11 @@ export default class Battlefield extends Phaser.Scene {
         const enemy3 = new Enemy();
         enemy3.render(this, Columns.THIRD_COLUMN);
         Battlefield.enemyGroup.add(enemy3.sprite);
-
+        /*
         const enemy4 = new Enemy();
         enemy4.render(this, Columns.FOURTH_COLUMN);
         Battlefield.enemyGroup.add(enemy4.sprite);
-
+        */
         //AllyExperienceBar.getExperienceBar().render(this);
         //EnemyExperienceBar.getExperienceBar().render(this);
 

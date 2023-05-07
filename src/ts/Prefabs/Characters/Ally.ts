@@ -37,7 +37,7 @@ export default class Ally extends Character {
 
     renderRoleIcons(): void {
         const y = this.sprite.getBottomCenter().y + 35;
-        const x = this.sprite.getBottomCenter().x - 20;
+        const x = this.sprite.getBottomCenter().x - 25;
 
         const otherRoles = this.getRoles().filter(
             (role: Role) => role !== this.currentRole && !(role instanceof Novice)
@@ -49,7 +49,7 @@ export default class Ally extends Character {
             let offsetX = 0;
 
             if (i % 2 !== 0) {
-                offsetX = 35;
+                offsetX = 40;
             }
 
             const icon = otherRoles[i].renderIcon(this, otherRoles[i], x + offsetX, y + offsetY, this.turnElements);
@@ -65,6 +65,7 @@ export default class Ally extends Character {
                     '',
                 );
                 radar.scale = 0.3;
+                radar.setTint(roleType.hexColor);
                 radar.anims.play('radar');
 
                 radar.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {

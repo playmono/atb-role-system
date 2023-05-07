@@ -102,7 +102,7 @@ export default abstract class Character {
         this.sprite.scale = this.currentRoleType.spriteScale;
 
         const oneThirdY = scene.cameras.main.width / 3;
-        const oneQuarterX = scene.cameras.main.width / 8;
+        const oneQuarterX = scene.cameras.main.width / 6;
 
         const offsetY = this.row === Rows.BELOW_ROW ? -30 : 0;
 
@@ -114,7 +114,7 @@ export default abstract class Character {
                 this,
                 this.currentRole,
                 this.sprite.getTopCenter().x,
-                this.sprite.getTopCenter().y + 5
+                this.sprite.getTopCenter().y + 10
             );
         } else {
             this.roleIcon.setTexture(this.currentRoleType.icon);

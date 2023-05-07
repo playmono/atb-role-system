@@ -10,7 +10,7 @@ import MainSettings from "./Scenes/MainSettings";
 const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 360,
     height: 640,
-    type: Phaser.CANVAS,
+    type: Phaser.AUTO,
     parent: "content",
     title: "Four Jobs Arena",
     physics: {
