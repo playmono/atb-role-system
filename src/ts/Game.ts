@@ -12,7 +12,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     height: 640,
     type: Phaser.WEBGL,
     parent: "content",
-    title: "Four Jobs Arena",
+    title: "Three Jobs Arena",
     physics: {
         default: 'arcade',
         arcade: {

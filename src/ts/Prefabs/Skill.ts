@@ -1,13 +1,15 @@
 import Battlefield from "../Scenes/Battlefied";
 import Ally from "./Characters/Ally";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
-import AllyExperienceBar from "./ExperienceBars/AllyExperienceBar";
+import Experience from "./Experience";
+
 import AllyQueue from "./Queues/AllyQueue";
 
 export default class Skill {
     ally: Ally;
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     mask: Phaser.Display.Masks.GeometryMask;
+    expIcon: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
     static readonly scale: number = 1;
     static readonly spriteName: string;
@@ -79,23 +81,29 @@ export default class Skill {
     }
 
     private configureOverlap(): void {
-        if (Skill.effectRange !== EffectRange.Self) {
-            this.sprite.scene.physics.add.overlap(
-                this.sprite,
-                Battlefield.enemyGroup,
-                this.onOverlap,
-                null,
-                this
-            );
+        this.sprite.scene.physics.add.overlap(
+            this.sprite,
+            Battlefield.enemyGroup,
+            this.onOverlap,
+            null,
+            this
+        );
 
-            this.sprite.scene.physics.add.overlap(
-                this.sprite,
-                Battlefield.allyGroup,
-                this.onOverlap,
-                null,
-                this
-            );
-        }
+        this.sprite.scene.physics.add.overlap(
+            this.sprite,
+            Experience.icon,
+            this.onOverlapWithExperience,
+            null,
+            this
+        );
+
+        this.sprite.scene.physics.add.overlap(
+            this.sprite,
+            Battlefield.allyGroup,
+            this.onOverlap,
+            null,
+            this
+        );
     }
 
     private onOverlap(
@@ -114,20 +122,27 @@ export default class Skill {
         */
 
         appliedOn.receiveSkill(skillType.damage);
-        //AllyExperienceBar.getExperienceBar().update(150);
-        this.ally.levelUp();
+
+        if (this.ally.currentRole.currentExperience >= this.ally.currentRole.getExperienceToNextLevel()) {
+            this.ally.levelUp();
+        }
+
         this.ally.endTurn();
+    }
+
+    private onOverlapWithExperience(skill: any, experienceIcon: any)  {
+        experienceIcon['__parentClass'].restart();
+        this.ally.addExperience(100);
     }
 
     private isDragging(pointer: Phaser.Input.Pointer, dragX: number, dragY: number): void {
         this.mask.geometryMask.clear();
         this.mask.geometryMask.fillCircle(this.sprite.x, this.sprite.y, Skill.dragValues.radius);
         this.sprite.scale = Skill.dragValues.scale;
-
     }
 
     private onDragStop(): void {
-        this.configureOverlap();
+        //this.configureOverlap();
         this.mask.geometryMask.clear();
         this.mask.geometryMask.fillCircle(this.sprite['__initialX'], this.sprite['__initialY'], Skill.initialValues.radius);
         this.sprite.scale = Skill.initialValues.scale;

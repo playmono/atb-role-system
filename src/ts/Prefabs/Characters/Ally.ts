@@ -51,13 +51,13 @@ export default class Ally extends Character {
             (role: Role) => role !== this.currentRole && !(role instanceof Novice)
         )
 
-        let offsetY = 0;
+        let offsetY = 10;
 
         for (let i = 0; i < otherRoles.length; i++) {
             let offsetX = 0;
 
             if (i % 2 !== 0) {
-                offsetX = 40;
+                offsetX = 45;
             }
 
             const icon = otherRoles[i].renderIcon(this, otherRoles[i], x + offsetX, y + offsetY, this.turnElements);
@@ -77,9 +77,8 @@ export default class Ally extends Character {
                 radar.anims.play('radar');
 
                 radar.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-                    this.sprite.scene.sound.play('changerole');
-                    this.roleIcon.destroy();
-                    this.currentRole.text.destroy();
+                    //this.sprite.scene.sound.play('changerole');
+                    this.currentRole.destroy();
                     this.setRole(roleType);
                     this.renderRole(this.sprite.scene);
                     this.endTurn();
@@ -92,7 +91,7 @@ export default class Ally extends Character {
             })
 
             if (i % 2 !== 0) {
-                offsetY += 35;
+                offsetY += 45;
             }
         }
     }
@@ -106,8 +105,6 @@ export default class Ally extends Character {
     }
 
     public endTurn(): void {
-        //Battlefield.turnElements.clear(true, true);
-        //this.sprite.setTint(0xa3e0ff);
         this.atbBar.bar.destroy();
         this.atbBar.render();
         this.turnElements.clear(true, true);

@@ -2,11 +2,10 @@ import { Columns, Rows } from "../Prefabs/Enums";
 import Hero from "../Prefabs/Characters/Ally";
 import Enemy from "../Prefabs/Characters/Enemy";
 import Utilities from "../Utilities";
-import AllyExperienceBar from "../Prefabs/ExperienceBars/AllyExperienceBar";
-import EnemyExperienceBar from "../Prefabs/ExperienceBars/EnemyExperienceBar";
+import Experience from "../Prefabs/Experience";
 
 export default class Battlefield extends Phaser.Scene {
-    public static Name = "Battlefield";
+    static Name = "Battlefield";
     static allyGroup: Phaser.GameObjects.Group;
     static enemyGroup: Phaser.GameObjects.Group;
     static turnElements: Phaser.GameObjects.Group;
@@ -39,11 +38,7 @@ export default class Battlefield extends Phaser.Scene {
         const hero3 = new Hero();
         hero3.render(this, Columns.THIRD_COLUMN);
         Battlefield.allyGroup.add(hero3.sprite);
-        /*
-        const hero4 = new Hero();
-        hero4.render(this, Columns.FOURTH_COLUMN);
-        Battlefield.allyGroup.add(hero4.sprite);
-        */
+
         const enemy1 = new Enemy();
         enemy1.render(this, Columns.FIRST_COLUMN);
         Battlefield.enemyGroup.add(enemy1.sprite);
@@ -55,13 +50,17 @@ export default class Battlefield extends Phaser.Scene {
         const enemy3 = new Enemy();
         enemy3.render(this, Columns.THIRD_COLUMN);
         Battlefield.enemyGroup.add(enemy3.sprite);
-        /*
-        const enemy4 = new Enemy();
-        enemy4.render(this, Columns.FOURTH_COLUMN);
-        Battlefield.enemyGroup.add(enemy4.sprite);
-        */
-        //AllyExperienceBar.getExperienceBar().render(this);
-        //EnemyExperienceBar.getExperienceBar().render(this);
+
+        const experienceField = new Phaser.Geom.Rectangle(
+            20,
+            this.cameras.main.centerY - 100,
+            this.cameras.main.width - 50,
+            100
+        );
+        //this.add.graphics({ lineStyle: { color: 0x00ff00 } }).strokeRectShape(rectangle);
+
+        const experience = new Experience(experienceField);
+        experience.render(this);
 
         this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
             gameObject.x = dragX;

@@ -114,7 +114,9 @@ export default class Preloader extends Phaser.Scene {
     }
 
     private loadVfx(): void {
+        this.load.image('experience_icon', 'effects/experience.png');
         this.load.atlas('radar', 'effects/radar/spritesheet.png', 'effects/radar/spritesheet.json');
+        this.load.atlas('flares', 'effects/flares/spritesheet.png', 'effects/flares/spritesheet.json');
     }
 
     private loadNovice(): void {

@@ -5,7 +5,7 @@ import Attack from "../Skills/Attack";
 
 export default class Novice extends Role {
     static readonly icon = 'novice_icon';
-    static readonly hexColor = 0x000000;
+    static readonly hexColor = 0xffff00;
     static readonly idleAnimation = 'novice_idle';
     static readonly spriteScale = 0.15;
     static readonly spriteOffsetY = 0;

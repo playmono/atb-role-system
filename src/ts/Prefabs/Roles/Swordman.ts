@@ -11,7 +11,7 @@ import Ragnarok from "../Skills/Ragnarok";
 
 export default class Swordman extends Role {
     static readonly icon = 'swordman_icon';
-    static readonly hexColor = 0xfffc33;
+    static readonly hexColor = 0xff0000;
     static readonly idleAnimation = 'swordman_idle';
     static readonly spriteScale = 0.15;
     static readonly spriteOffsetY = 0;

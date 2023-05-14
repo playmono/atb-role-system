@@ -29,8 +29,6 @@ export default abstract class Character {
     gender: number;
     topCircle: Phaser.Geom.Circle;
 
-    roleIcon: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-
     constructor() {
         this.gender = Math.random();
         this.healthBar = new HealthBar(this);
@@ -113,12 +111,7 @@ export default abstract class Character {
         const graphics = this.sprite.scene.add.graphics({ lineStyle: { color: 0x00ff00 } });
         //graphics.strokeCircleShape(this.topCircle);
 
-        if (this.roleIcon !== undefined) {
-            //this.roleIcon.destroy();
-            //this.roleIcon.text
-        }
-
-        this.roleIcon = this.currentRole.renderIcon(
+        this.currentRole.renderIcon(
             this,
             this.currentRole,
             this.topCircle.x,
@@ -129,6 +122,10 @@ export default abstract class Character {
     public levelUp(): void {
         this.level++;
         this.currentRole.levelUp();
+    }
+
+    public addExperience(experience: number): void {
+        this.currentRole.addExperience(experience);
     }
 
     protected receiveSkill(damage: number): void {
@@ -155,8 +152,7 @@ export default abstract class Character {
     }
 
     protected die(): void {
-        this.roleIcon.destroy();
-        this.currentRole.text.destroy();
+        this.currentRole.destroy();
         this.sprite.destroy();
         this.atbBar.bar.destroy();
         this.atbBar.progressBox.destroy();
