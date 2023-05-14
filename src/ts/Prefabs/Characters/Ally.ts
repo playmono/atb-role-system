@@ -1,8 +1,6 @@
-import Battlefield from "../../Scenes/Battlefied";
 import Character from "../Character";
 import { RolesMap } from "../Constants";
 import { Rows, Columns } from "../Enums";
-import AllyQueue from "../Queues/AllyQueue";
 import Role from "../Role";
 import Archer from "../Roles/Archer";
 import Novice from "../Roles/Novice";
@@ -14,7 +12,6 @@ export default class Ally extends Character {
 
     barReady(): void {
         this.startTurn();
-        //AllyQueue.getQueue().enqueue(this);
     }
 
     render(scene: Phaser.Scene, column: Columns): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody  {

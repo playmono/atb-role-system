@@ -1,4 +1,3 @@
-import AtbBar from "./Bars/AtbBar";
 import Character from "./Character";
 import { RolesMap } from "./Constants";
 import { EffectRange } from "./Enums";

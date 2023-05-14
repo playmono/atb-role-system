@@ -3,8 +3,6 @@ import Ally from "./Characters/Ally";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 import Experience from "./Experience";
 
-import AllyQueue from "./Queues/AllyQueue";
-
 export default class Skill {
     ally: Ally;
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;

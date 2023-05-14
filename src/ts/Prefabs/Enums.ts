@@ -1,9 +1,3 @@
-import Archer from "./Roles/Archer";
-import BlackMage from "./Roles/BlackMage";
-import Novice from "./Roles/Novice";
-import Warrior from "./Roles/Swordman";
-import WhiteMage from "./Roles/WhiteMage";
-
 export enum AreaOfEffect {
     Single,
     Row,
