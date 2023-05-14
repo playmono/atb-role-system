@@ -141,6 +141,6 @@ export default abstract class Role {
     }
 
     public getExperienceToNextLevel(): number {
-        return (this.level / 0.15) ** 1.8;
+        return (this.level / 0.15) ** 1.9;
     }
 }

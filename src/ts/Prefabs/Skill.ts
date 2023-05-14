@@ -129,8 +129,7 @@ export default class Skill {
     }
 
     private onOverlapWithExperience(skill: any, experienceIcon: any)  {
-        experienceIcon['__parentClass'].restart();
-        this.ally.addExperience(100);
+        experienceIcon['__parentClass'].sendToAlly(skill['__parentClass'].ally);
     }
 
     private isDragging(pointer: Phaser.Input.Pointer, dragX: number, dragY: number): void {

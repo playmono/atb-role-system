@@ -46,7 +46,7 @@ export default class Ally extends Character {
 
         const otherRoles = this.getRoles().filter(
             (role: Role) => role !== this.currentRole && !(role instanceof Novice)
-        )
+        );
 
         let offsetY = 10;
 
@@ -102,6 +102,13 @@ export default class Ally extends Character {
     }
 
     public endTurn(): void {
+        // We have to stop emitters manually
+        const otherRoles = this.getRoles().filter(
+            (role: Role) => role !== this.currentRole && !(role instanceof Novice) && role.emitter !== undefined
+        );
+        otherRoles.forEach((otherRole) => {
+            otherRole.emitter.stop();
+        });
         this.atbBar.bar.destroy();
         this.atbBar.render();
         this.turnElements.clear(true, true);

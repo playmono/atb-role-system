@@ -1,3 +1,5 @@
+import Ally from "./Characters/Ally";
+
 export default class Experience {
     static field: Phaser.Geom.Rectangle;
     static icon: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -25,8 +27,19 @@ export default class Experience {
         Experience.icon.disableBody(true, true);
     }
 
-    public restart() {
-        this.deactivate();
+    public sendToAlly(ally: Ally): void {
+        Experience.icon.disableBody(true, false);
+        const tween = ally.sprite.scene.tweens.add({
+            targets: Experience.icon,
+            x: ally.currentRole.roleIcon.x,
+            y: ally.currentRole.roleIcon.y,
+            ease: {x: 'Quart.In', y: 'Back.in'},
+            duration: 300
+        });
+        tween.on('complete', () => {
+            ally.addExperience(100);
+            this.deactivate();
+        });
 
         const rnd = Phaser.Math.Between(3000, 5000);
         Experience.icon.scene.time.delayedCall(rnd, this.activate, [], this);
