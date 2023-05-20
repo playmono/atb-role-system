@@ -1,10 +1,18 @@
 # Active Time Battle Role System
 
-## Run dev mode
+## Run the game
+This game has two parts: the game itself and the server. In order to run the full project, you must run two processes.
+
 1. Download the source code
-2. Execute the following commands
+2. Run the backend (AKA the server)
 ```bash
-cd download_folder
+cd backend
+npm install
+npm run start
+```
+3. Run the frontend (AKA the game)
+```bash
+cd frontend
 npm install
 npm run start:dev
 # Run `npm run` to check all the commands
