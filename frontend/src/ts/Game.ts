@@ -6,13 +6,17 @@ import SplashScreen from "./Scenes/SplashScreen";
 import Utilities from "./Utilities";
 import Battlefield from "./Scenes/Battlefied";
 import MainSettings from "./Scenes/MainSettings";
+import { Peer } from "peerjs";
+import { v4 as uuidv4 } from 'uuid';
+import SignUp from './Scenes/SignUp';
+import Login from './Scenes/Login';
 
 const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 360,
     height: 640,
     type: Phaser.WEBGL,
     parent: "content",
-    title: "Three Jobs Arena",
+    title: "Four Jobs Arena",
     physics: {
         default: 'arcade',
         arcade: {
@@ -22,7 +26,10 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     scale: {
         mode: Phaser.Scale.FIT,
         //mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH
-    }
+    },
+    dom: {
+        createContainer: true
+    },
 };
 
 export default class Game extends Phaser.Game {
@@ -34,10 +41,20 @@ export default class Game extends Phaser.Game {
         this.scene.add(Boot.Name, Boot);
         this.scene.add(Preloader.Name, Preloader);
         this.scene.add(SplashScreen.Name, SplashScreen);
+        this.scene.add(SignUp.Name, SignUp);
+        this.scene.add(Login.Name, Login);
         this.scene.add(MainMenu.Name, MainMenu);
         this.scene.add(Battlefield.Name, Battlefield);
         this.scene.add(MainSettings.Name, MainSettings);
         this.scene.start(Boot.Name);
+
+        const peer = new Peer(uuidv4(), {
+            host: "localhost",
+            port: 9000,
+            path: "/peerjs/myapp"
+        });
+
+        console.log(peer);
     }
 }
 
