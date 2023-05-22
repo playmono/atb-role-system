@@ -1,7 +1,7 @@
 import Utilities from "../Utilities";
-import Battlefield from "./Battlefied";
 import MainMenu from "./MainMenu";
-import MainSettings from "./MainSettings";
+import PeerWrapper from "../Plugins/PeerWrapper";
+import Lobby from "./Lobby";
 
 export default class Login extends Phaser.Scene {
 	/**
@@ -19,11 +19,39 @@ export default class Login extends Phaser.Scene {
 		const fontSize = 25;
 
         const element = this.add.dom(this.cameras.main.centerX, startYPosition).createFromCache('login');
-        const button = element.getChildByName('playButton');
+        const button = element.getChildByName('button');
         button.setAttribute('value', 'Login');
 
+        element.addListener('click');
+        const _that = this;
+        element.on('click', async function (event) {
+            if (event.target.name === 'button') {
+                try {
+                    const data = {
+                        username: this.getChildByName('usernameField').value,
+                        password: this.getChildByName('passwordField').value
+                    };
+                    const response = await fetch("http://localhost:9000/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    const responseData = await response.json();
+                    if (response.status !== 200) {
+                        throw new Error(responseData.errorMessage);
+                    }
+                    const peer = new PeerWrapper(responseData.auth_token);
+                    _that.scene.start(Lobby.Name);
+                } catch (error) {
+                    this.getChildByID('error').innerText = error.message;
+                }
+            }
+        });
+
 		// Add a button to return to the main menu.
-		const backText = this.add.text(this.cameras.main.centerX, startYPosition * 2, "Go Back");
+		const backText = this.add.text(this.cameras.main.centerX, startYPosition * 2 + 100, "Go Back");
 		backText
 			.setOrigin(0.5)
 			.setFontFamily("monospace").setFontSize(fontSize).setFill("#fff")

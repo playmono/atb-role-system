@@ -6,10 +6,9 @@ import SplashScreen from "./Scenes/SplashScreen";
 import Utilities from "./Utilities";
 import Battlefield from "./Scenes/Battlefied";
 import MainSettings from "./Scenes/MainSettings";
-import { Peer } from "peerjs";
-import { v4 as uuidv4 } from 'uuid';
 import SignUp from './Scenes/SignUp';
 import Login from './Scenes/Login';
+import Lobby from './Scenes/Lobby';
 
 const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 360,
@@ -43,18 +42,11 @@ export default class Game extends Phaser.Game {
         this.scene.add(SplashScreen.Name, SplashScreen);
         this.scene.add(SignUp.Name, SignUp);
         this.scene.add(Login.Name, Login);
+        this.scene.add(Lobby.Name, Lobby);
         this.scene.add(MainMenu.Name, MainMenu);
         this.scene.add(Battlefield.Name, Battlefield);
         this.scene.add(MainSettings.Name, MainSettings);
         this.scene.start(Boot.Name);
-
-        const peer = new Peer(uuidv4(), {
-            host: "localhost",
-            port: 9000,
-            path: "/peerjs/myapp"
-        });
-
-        console.log(peer);
     }
 }
 

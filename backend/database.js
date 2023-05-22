@@ -49,6 +49,28 @@ const database = {
         });
     },
 
+    findPlayerById: function(id) {
+        return new Promise((resolve, reject) => {
+            const db = new sqlite3.Database(DB_NAME);
+            let player = null;
+            db.get('SELECT * FROM player WHERE id = ?', [id], (error, row) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    const result = !row ? null : new Player({
+                        id: row.id,
+                        username: row.username,
+                        password: row.password,
+                        rating: row.rating,
+                        created_at: row.creating_at
+                    });
+                    resolve(result);
+                }
+            });
+            db.close();
+        });
+    },
+
     create: function() {
         if (fileSystem.existsSync(DB_NAME)) {
             return;

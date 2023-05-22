@@ -9,6 +9,7 @@
     "dotenv": "^16.0.3",
     "esm": "^3.2.25",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "pbkdf2-password": "^1.2.1",
     "pbkdf2-password-hash": "^3.1.0",
     "peer": "^1.0.0",

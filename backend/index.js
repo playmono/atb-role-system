@@ -1,4 +1,4 @@
-import { APP_PORT, DB_NAME } from "./constants.js";
+import { APP_PORT, JWT_SECRET } from "./constants.js";
 import express from "express";
 import { ExpressPeerServer } from "peer";
 import cors from "cors";
@@ -6,6 +6,9 @@ import bodyParser from "body-parser";
 import database from "./database.js";
 import Player from "./models/Player.js";
 import passwordHash from "pbkdf2-password-hash";
+import jwt from "jsonwebtoken";
+
+let activePlayers = new Map();
 
 database.create();
 
@@ -13,8 +16,7 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
-
-app.get("/", (req, res, next) => res.send("Hello world!"));
+//app.get("/", (req, res, next) => res.send("Hello world!"));
 
 app.post("/sign-up", (req, res) => {
     console.log('Received POST /sign-up');
@@ -42,13 +44,7 @@ app.post("/sign-up", (req, res) => {
         })
         .catch ((error) => {
             console.log(error);
-
-            switch (error.code) {
-                case "VALIDATION_ERROR":
-                    res.status(412).send(JSON.stringify({errorCode: 412, erorrMessage: error.message}));
-                default:
-                    return res.status(500).send(JSON.stringify({errorCode: 500, erorrMessage: "Something went wrong"}));
-            }
+            return sendError(res, error);
         });
 });
 
@@ -56,7 +52,95 @@ app.post("/login", (req, res) => {
     console.log('Received POST /login');
     const data = req.body;
 
+    let player;
+
     database.findPlayerByUsername(data.username)
+        .then((playerFound) => {
+            return new Promise((resolve, reject) => {
+                if (!playerFound) {
+                    const e = new Error('Player not found');
+                    e.code = "NOT_FOUND";
+                    reject(e);
+                } else {
+                    player = playerFound;
+                    resolve(player);
+                }
+            });
+        })
+        .then((player) => passwordHash.compare(data.password, player.password))
+        .then((isValid) => {
+            return new Promise((resolve, reject) => {
+                if (!isValid) {
+                    const e = new Error('Unauthorized');
+                    e.code = "UNAUTHORIZED";
+                    reject(e);
+                } else {
+                    resolve();
+                }
+            });
+        })
+        .then(() => {
+            const token = jwt.sign({id: player.id}, JWT_SECRET, { expiresIn: '30s' });
+            res.status(200).send(JSON.stringify({auth_token: token}));
+        })
+        .catch ((error) => {
+            console.log(error);
+            return sendError(res, error);
+        });
+});
+
+app.get("/active-players", (req, res) => {
+    console.log('Received GET /active-players');
+    res.status(200).send(JSON.stringify(Array.from(activePlayers.entries())));
+});
+
+function sendError(res, error) {
+    let errorCode = 500;
+    let errorMessage = error.message;
+    switch (error.code) {
+        case "VALIDATION_ERROR":
+            errorCode = 412;
+            break;
+        case "NOT_FOUND":
+            errorCode = 404;
+            break;
+        case "UNAUTHORIZED":
+            errorCode = 401;
+            break;
+        default:
+            errorMessage = "Something went wrong";
+            break;
+    }
+    return res.status(errorCode).send(JSON.stringify({errorCode: errorCode, errorMessage: errorMessage}));
+}
+
+// =======
+
+console.log('Server up listening on port ' + APP_PORT + '... ');
+const server = app.listen(APP_PORT);
+
+const peerServer = ExpressPeerServer(server, {
+    debug: true,
+    allow_discovery: true
+});
+
+app.use('/peerjs', peerServer);
+
+peerServer.on('disconnect', (client) => { console.log('client disconnected');});
+
+peerServer.on('connection', client => {
+    console.log('Received a peer server connection request');
+
+    new Promise((resolve, reject) => {
+        jwt.verify(client.token, JWT_SECRET, (error, decoded) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(decoded);
+            }
+        });
+    })
+    .then((decoded) => database.findPlayerById(decoded.id))
     .then((player) => {
         return new Promise((resolve, reject) => {
             if (!player) {
@@ -68,35 +152,12 @@ app.post("/login", (req, res) => {
             }
         });
     })
-    .then((player) => passwordHash.compare(data.password, player.password))
-    .then((isValid) => {
-        if (isValid) {
-            res.status(200).send({message: "OK"});
-        } else {
-            res.status(401).send(JSON.stringify({errorCode: 401, erorrMessage: "Unauthorized"}));
-        }
+    .then((player) => {
+        player.hidePassword();
+        activePlayers.set(client.id, player);
     })
     .catch ((error) => {
         console.log(error);
-
-        switch (error.code) {
-            case "NOT_FOUND":
-                return res.status(404).send(JSON.stringify({errorCode: 404, erorrMessage: error.message}));
-            default:
-                return res.status(500).send(JSON.stringify({errorCode: 500, erorrMessage: "Something went wrong"}));
-        }
+        client.socket.close();
     });
 });
-
-// =======
-
-console.log('Server up listening on port ' + APP_PORT + '... ');
-const server = app.listen(APP_PORT);
-
-/*
-const peerServer = ExpressPeerServer(server, {
-    path: "/myapp",
-});
-
-app.use("/peerjs", peerServer);
-*/
