@@ -116,8 +116,8 @@ function sendError(res, error) {
 
 // =======
 
-console.log('Server up listening on port ' + APP_PORT + '... ');
-const server = app.listen(APP_PORT);
+console.log('Server up listening on port ' + PORT + '... ');
+const server = app.listen(PORT);
 
 const peerServer = ExpressPeerServer(server, {
     debug: true,
