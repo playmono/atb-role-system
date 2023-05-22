@@ -1,4 +1,4 @@
-import { APP_PORT, JWT_SECRET } from "./constants.js";
+import { PORT, JWT_SECRET } from "./constants.js";
 import express from "express";
 import { ExpressPeerServer } from "peer";
 import cors from "cors";
