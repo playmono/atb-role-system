@@ -3,6 +3,7 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
 	entry: {
@@ -54,7 +55,8 @@ module.exports = {
 					}
 				}
 			]
-		})
+		}),
+		new Dotenv()
 	],
 	performance: {
 		maxEntrypointSize: 512000,
@@ -68,6 +70,6 @@ module.exports = {
 		}
 	},
 	devServer: {
-		open: true
+		open: true,
 	}
 };

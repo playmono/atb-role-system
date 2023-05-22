@@ -9,11 +9,11 @@ export default class PeerWrapper {
             return PeerWrapper.instance;
         }
 
-        this.peer = new Peer(undefined, {
-            host: 'localhost',
-            port: 9000,
+        this.peer = new Peer({
+            host: process.env.APP_URL,
             path: '/peerjs',
-            token: auth_token
+            token: auth_token,
+            secure: process.env.APP_PROTOCOL === 'https'
         });
 
         PeerWrapper.instance = this;

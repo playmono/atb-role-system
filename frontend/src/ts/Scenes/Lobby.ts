@@ -18,7 +18,8 @@ export default class Lobby extends Phaser.Scene {
 
         const peer = new PeerWrapper();
 
-        const response = await fetch("http://localhost:9000/active-players", {
+        const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL;
+        const response = await fetch(`${url}/active-players`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"

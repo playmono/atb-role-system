@@ -31,7 +31,8 @@ export default class Login extends Phaser.Scene {
                         username: this.getChildByName('usernameField').value,
                         password: this.getChildByName('passwordField').value
                     };
-                    const response = await fetch("http://localhost:9000/login", {
+                    const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL;
+                    const response = await fetch(`${url}/login`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
