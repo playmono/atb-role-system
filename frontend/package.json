@@ -22,10 +22,8 @@
 	"scripts": {
 		"build": "webpack --mode production",
 		"build-dev": "webpack --mode none",
-		"start": "webpack serve --mode production",
 		"start:dev": "webpack serve --mode production",
-		"lint": "eslint . --ext .js,.jsx,.ts,.tsx || (exit 0)",
-		"postinstall": "webpack -p --config ./webpack.prod.config.js --progress"
+		"lint": "eslint . --ext .js,.jsx,.ts,.tsx || (exit 0)"
 	},
 	
 	"devDependencies": {
