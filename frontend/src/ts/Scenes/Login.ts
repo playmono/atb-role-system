@@ -1,6 +1,6 @@
 import Utilities from "../Utilities";
 import MainMenu from "./MainMenu";
-import PeerWrapper from "../Plugins/PeerWrapper";
+import GameServer from "../Prefabs/GameServer";
 import Lobby from "./Lobby";
 
 export default class Login extends Phaser.Scene {
@@ -31,7 +31,7 @@ export default class Login extends Phaser.Scene {
                         username: this.getChildByName('usernameField').value,
                         password: this.getChildByName('passwordField').value
                     };
-                    const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL;
+                    const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL + ':' + process.env.APP_PORT;
                     const response = await fetch(`${url}/login`, {
                         method: "POST",
                         headers: {
@@ -43,8 +43,12 @@ export default class Login extends Phaser.Scene {
                     if (response.status !== 200) {
                         throw new Error(responseData.errorMessage);
                     }
-                    const peer = new PeerWrapper(responseData.auth_token);
-                    _that.scene.start(Lobby.Name);
+                    const gameServer = new GameServer(responseData.auth_token);
+                    gameServer.peer.on('open', async (id) => {
+                        await gameServer.setPlayer();
+                        await gameServer.setPlayerList();
+                        _that.scene.start(Lobby.Name);
+                    });
                 } catch (error) {
                     this.getChildByID('error').innerText = error.message;
                 }

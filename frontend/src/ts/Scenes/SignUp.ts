@@ -24,7 +24,7 @@ export default class SignUp extends Phaser.Scene {
                         username: this.getChildByName('usernameField').value,
                         password: this.getChildByName('passwordField').value
                     };
-                    const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL;
+                    const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL + ':' + process.env.APP_PORT;
                     const response = await fetch(`${url}/sign-up`, {
                         method: "POST",
                         headers: {

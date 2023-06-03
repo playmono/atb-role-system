@@ -114,9 +114,12 @@ export default class Preloader extends Phaser.Scene {
     }
 
     private loadVfx(): void {
-        this.load.image('experience_icon', 'effects/experience.png');
-        this.load.atlas('radar', 'effects/radar/spritesheet.png', 'effects/radar/spritesheet.json');
-        this.load.atlas('flares', 'effects/flares/spritesheet.png', 'effects/flares/spritesheet.json');
+        this.load.image('experience_icon', 'vfx/experience.png');
+        this.load.image('challenge_icon', 'vfx/challenge_icon.png');
+        this.load.image('accept_button', 'vfx/accept_button.png');
+        this.load.image('decline_button', 'vfx/decline_button.png');
+        this.load.atlas('radar', 'vfx/radar/spritesheet.png', 'vfx/radar/spritesheet.json');
+        this.load.atlas('flares', 'vfx/flares/spritesheet.png', 'vfx/flares/spritesheet.json');
     }
 
     private loadNovice(): void {

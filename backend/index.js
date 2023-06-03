@@ -7,8 +7,11 @@ import database from "./database.js";
 import Player from "./models/Player.js";
 import passwordHash from "pbkdf2-password-hash";
 import jwt from "jsonwebtoken";
+import User from "./models/User.js";
+import { v4 as uuidv4 } from 'uuid';
 
-let activePlayers = new Map();
+const users = new Map();
+const challenges = new Map();
 
 database.create();
 
@@ -18,7 +21,7 @@ app.use(cors());
 app.use(bodyParser.json());
 //app.get("/", (req, res, next) => res.send("Hello world!"));
 
-app.post("/sign-up", (req, res) => {
+app.post("/sign-up", async (req, res) => {
     console.log('Received POST /sign-up');
     const data = req.body;
 
@@ -80,7 +83,20 @@ app.post("/login", (req, res) => {
             });
         })
         .then(() => {
-            const token = jwt.sign({id: player.id}, JWT_SECRET, { expiresIn: '30s' });
+            return new Promise((resolve, reject) => {
+                users.forEach((user) => {
+                    if (user.player.id === player.id) {
+                        const e = new Error('User is already logged');
+                        e.code = "UNAUTHORIZED";
+                        reject(e);
+                    }
+                });
+
+                resolve();
+            });
+        })
+        .then(() => {
+            const token = jwt.sign({id: player.id}, JWT_SECRET, { expiresIn: '24h' });
             res.status(200).send(JSON.stringify({auth_token: token}));
         })
         .catch ((error) => {
@@ -89,9 +105,71 @@ app.post("/login", (req, res) => {
         });
 });
 
-app.get("/active-players", (req, res) => {
+app.get("/get-player-by-client-id/:clientId", authenticateToken, (req, res) => {
+    console.log('Received GET /get-player-by-client-id/');
+    const user = users.get(req.params.clientId);
+    if (!user) {
+        res.status(404).send();
+    } else {
+        res.status(200).send(JSON.stringify(user.player));
+    }
+});
+
+app.post("/challenges", authenticateToken, (req, res) => {
+    console.log('Received POST /challenge-player');
+    const user = getUserByPlayerId(req.body.playerId);
+    const challengeId = req.body.challengeId;
+
+    challenges.set(challengeId, {
+        from: req.user,
+        to: user
+    });
+
+    if (!user) {
+        res.sendStatus(404);
+    } else {
+        res.status(200).send(challengeId);
+        user.client.send({
+            type: 'challenge',
+            data: {
+                challengeId: challengeId,
+                player: req.user.player
+            }
+        });
+    }
+});
+
+app.post("/accept-challenge/:challengeId", authenticateToken, (req, res) => {
+    console.log('Received POST /accept-challenge');
+    const challenge = challenges.get(req.params.challengeId);
+    if (!challenge) {
+        res.sendStatus(404);
+        return;
+    }
+
+    if (challenge.to.player.id !== req.user.player.id) {
+        res.sendStatus(403);
+        return;
+    }
+
+    const data = {
+        type: 'startGame',
+        data: {
+            challengeId: req.params.challengeId
+        }
+    };
+
+    challenge.to.client.send(data);
+    challenge.from.client.send(data);
+});
+
+app.get("/active-players", authenticateToken, (req, res) => {
     console.log('Received GET /active-players');
-    res.status(200).send(JSON.stringify(Array.from(activePlayers.entries())));
+    let players = [];
+    users.forEach((user) => {
+        players.push(user.player);
+    })
+    res.status(200).send(JSON.stringify(players));
 });
 
 function sendError(res, error) {
@@ -126,7 +204,16 @@ const peerServer = ExpressPeerServer(server, {
 
 app.use('/peerjs', peerServer);
 
-peerServer.on('disconnect', (client) => { console.log('client disconnected');});
+peerServer.on('disconnect', (disconnectedClient) => {
+    const playerDisconnected = users.get(disconnectedClient.getId());    
+    for (let [key, user] of users) {
+        user.client.send({
+            type: 'disconnect',
+            data: playerDisconnected.player.id
+        });
+    }
+    users.delete(disconnectedClient.getId());
+});
 
 peerServer.on('connection', client => {
     console.log('Received a peer server connection request');
@@ -154,10 +241,44 @@ peerServer.on('connection', client => {
     })
     .then((player) => {
         player.hidePassword();
-        activePlayers.set(client.id, player);
+        for (let [key, user] of users) {
+            user.client.send({
+                type: 'connect',
+                data: player
+            })
+        }
+        users.set(client.id, new User(player, client));
     })
     .catch ((error) => {
         console.log(error);
         client.socket.close();
     });
 });
+
+function authenticateToken(req, res, callback) {
+    const token = req.headers['authorization'];
+
+    if (token == null) {
+        return res.sendStatus(401);
+    }
+
+    jwt.verify(token, JWT_SECRET, async (error, decoded) => {
+        if (error) return res.sendStatus(403);
+        const player = await database.findPlayerById(decoded.id);
+        const user = getUserByPlayerId(player.id);
+        if (!user) return res.sendStatus(500);
+        req.user = user;
+        callback();
+    });
+}
+
+function getUserByPlayerId(playerId)
+{
+    for (let [key, user] of users) {
+        if (user.player.id === playerId) {
+            return user;
+        }
+    }
+
+    return null;
+}

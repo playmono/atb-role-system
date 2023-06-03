@@ -30,7 +30,6 @@ const database = {
     findPlayerByUsername: function(username) {
         return new Promise((resolve, reject) => {
             const db = new sqlite3.Database(DB_NAME);
-            let player = null;
             db.get('SELECT * FROM player WHERE username = ?', [username], (error, row) => {
                 if (error) {
                     reject(error);
@@ -52,7 +51,6 @@ const database = {
     findPlayerById: function(id) {
         return new Promise((resolve, reject) => {
             const db = new sqlite3.Database(DB_NAME);
-            let player = null;
             db.get('SELECT * FROM player WHERE id = ?', [id], (error, row) => {
                 if (error) {
                     reject(error);
