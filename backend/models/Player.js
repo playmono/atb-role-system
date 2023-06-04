@@ -14,6 +14,7 @@ export default class Player {
         this.password = object.password;
         this.rating = object.rating;
         this.created_at = this.created_at ?? new Date().toISOString();
+        this.status = 'pending';
     }
 
     static validateData(data) {

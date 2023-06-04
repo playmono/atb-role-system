@@ -116,6 +116,7 @@ export default class Preloader extends Phaser.Scene {
     private loadVfx(): void {
         this.load.image('experience_icon', 'vfx/experience.png');
         this.load.image('challenge_icon', 'vfx/challenge_icon.png');
+        this.load.image('waiting_icon', 'vfx/waiting_icon.png');
         this.load.image('accept_button', 'vfx/accept_button.png');
         this.load.image('decline_button', 'vfx/decline_button.png');
         this.load.atlas('radar', 'vfx/radar/spritesheet.png', 'vfx/radar/spritesheet.json');

@@ -8,7 +8,6 @@ import Player from "./models/Player.js";
 import passwordHash from "pbkdf2-password-hash";
 import jwt from "jsonwebtoken";
 import User from "./models/User.js";
-import { v4 as uuidv4 } from 'uuid';
 
 const users = new Map();
 const challenges = new Map();
@@ -109,15 +108,22 @@ app.get("/get-player-by-client-id/:clientId", authenticateToken, (req, res) => {
     console.log('Received GET /get-player-by-client-id/');
     const user = users.get(req.params.clientId);
     if (!user) {
-        res.status(404).send();
-    } else {
-        res.status(200).send(JSON.stringify(user.player));
+        return sendError(res, {code: 404, message: 'Player not found'});
     }
+    res.status(200).send(JSON.stringify(user.player));
 });
 
 app.post("/challenges", authenticateToken, (req, res) => {
     console.log('Received POST /challenge-player');
     const user = getUserByPlayerId(req.body.playerId);
+    if (!user) {
+        return sendError(res, {code: 404, message: 'Player not found'});
+    }
+
+    if (playerIsAlreadyInChallenge(user.player.id)) {
+        return sendError(res, {code: 409, message: `Player ${user.player.username} already in challenge`});
+    }
+
     const challengeId = req.body.challengeId;
 
     challenges.set(challengeId, {
@@ -125,37 +131,71 @@ app.post("/challenges", authenticateToken, (req, res) => {
         to: user
     });
 
-    if (!user) {
-        res.sendStatus(404);
-    } else {
-        res.status(200).send(challengeId);
-        user.client.send({
-            type: 'challenge',
-            data: {
-                challengeId: challengeId,
-                player: req.user.player
-            }
-        });
-    }
+    // set players as challenged in internal array
+    req.user.player.status = 'challenged';
+    user.player.status = 'challenged';
+
+    // set to all clients that these users are in pending
+    sendToAllClients({
+        type: 'playerUpdate',
+        data: {
+            players: [
+                req.user.player,
+                user.player
+            ]
+        }
+    });
+
+    // Send the challenge to the player requested
+    user.client.send({
+        type: 'challengeOffer',
+        data: {
+            challengeId: challengeId,
+            from: req.user.player
+        }
+    });
+
+    // Send OK to the user that request the challenge
+    res.status(200).send(JSON.stringify(challengeId));
 });
 
-app.post("/accept-challenge/:challengeId", authenticateToken, (req, res) => {
-    console.log('Received POST /accept-challenge');
+app.put("/challenge/:challengeId", authenticateToken, (req, res) => {
+    console.log('Received PUT /challenge');
     const challenge = challenges.get(req.params.challengeId);
     if (!challenge) {
-        res.sendStatus(404);
-        return;
+        return sendError(res, {code: 404, message: 'Challenge not found'});
+    }
+    if (challenge.to.player.id !== req.user.player.id && req.body.status === 'accept') {
+        return sendError(res, {code: 403, message: 'Anoter player cannot accept the challenge'});
     }
 
-    if (challenge.to.player.id !== req.user.player.id) {
-        res.sendStatus(403);
-        return;
+    if (req.body.status === 'accept') {
+        challenge.to.player.status = 'ingame';
+        challenge.from.player.status = 'ingame';
+    } else if (req.body.status === 'decline') {
+        challenge.to.player.status = 'pending';
+        challenge.from.player.status = 'pending';
     }
+
+    // send to all players that the challenge has been declined or accepted
+    sendToAllClients({
+        type: 'playerUpdate',
+        data: {
+            players: [
+                challenge.to.player,
+                challenge.from.player
+            ]
+        }
+    });
+
+    // create new game instance
+    challenges.delete(req.params.challengeId);
 
     const data = {
-        type: 'startGame',
+        type: 'challengeResponse',
         data: {
-            challengeId: req.params.challengeId
+            status: req.body.status,
+            challengeId: req.params.challengeId,
         }
     };
 
@@ -186,7 +226,7 @@ function sendError(res, error) {
             errorCode = 401;
             break;
         default:
-            errorMessage = "Something went wrong";
+            errorMessage = errorMessage ?? "Something went wrong";
             break;
     }
     return res.status(errorCode).send(JSON.stringify({errorCode: errorCode, errorMessage: errorMessage}));
@@ -205,13 +245,11 @@ const peerServer = ExpressPeerServer(server, {
 app.use('/peerjs', peerServer);
 
 peerServer.on('disconnect', (disconnectedClient) => {
-    const playerDisconnected = users.get(disconnectedClient.getId());    
-    for (let [key, user] of users) {
-        user.client.send({
-            type: 'disconnect',
-            data: playerDisconnected.player.id
-        });
-    }
+    const playerDisconnected = users.get(disconnectedClient.getId());
+    sendToAllClients({
+        type: 'disconnect',
+        data: playerDisconnected.player.id
+    });
     users.delete(disconnectedClient.getId());
 });
 
@@ -241,12 +279,10 @@ peerServer.on('connection', client => {
     })
     .then((player) => {
         player.hidePassword();
-        for (let [key, user] of users) {
-            user.client.send({
-                type: 'connect',
-                data: player
-            })
-        }
+        sendToAllClients({
+            type: 'connect',
+            data: player
+        });
         users.set(client.id, new User(player, client));
     })
     .catch ((error) => {
@@ -272,8 +308,7 @@ function authenticateToken(req, res, callback) {
     });
 }
 
-function getUserByPlayerId(playerId)
-{
+function getUserByPlayerId(playerId) {
     for (let [key, user] of users) {
         if (user.player.id === playerId) {
             return user;
@@ -281,4 +316,20 @@ function getUserByPlayerId(playerId)
     }
 
     return null;
+}
+
+function playerIsAlreadyInChallenge(playerId) {
+    for (let[key, challenge] of challenges) {
+        if (challenge.to.player.id === playerId || challenge.from.player.id === playerId) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function sendToAllClients(data) {
+    for (let [key, user] of users) {
+        user.client.send(data);
+    }
 }
