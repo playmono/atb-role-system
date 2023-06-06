@@ -120,7 +120,7 @@ app.post("/challenges", authenticateToken, (req, res) => {
         return sendError(res, {code: 404, message: 'Player not found'});
     }
 
-    if (playerIsAlreadyInChallenge(user.player.id)) {
+    if (getChallengeIdByPlayerId(user.player.id)) {
         return sendError(res, {code: 409, message: `Player ${user.player.username} already in challenge`});
     }
 
@@ -135,6 +135,15 @@ app.post("/challenges", authenticateToken, (req, res) => {
     req.user.player.status = 'challenged';
     user.player.status = 'challenged';
 
+    // Send the challenge to the player requested
+    user.client.send({
+        type: 'challengeOffer',
+        data: {
+            challengeId: challengeId,
+            from: req.user.player
+        }
+    });
+
     // set to all clients that these users are in pending
     sendToAllClients({
         type: 'playerUpdate',
@@ -143,15 +152,6 @@ app.post("/challenges", authenticateToken, (req, res) => {
                 req.user.player,
                 user.player
             ]
-        }
-    });
-
-    // Send the challenge to the player requested
-    user.client.send({
-        type: 'challengeOffer',
-        data: {
-            challengeId: challengeId,
-            from: req.user.player
         }
     });
 
@@ -169,38 +169,7 @@ app.put("/challenge/:challengeId", authenticateToken, (req, res) => {
         return sendError(res, {code: 403, message: 'Anoter player cannot accept the challenge'});
     }
 
-    if (req.body.status === 'accept') {
-        challenge.to.player.status = 'ingame';
-        challenge.from.player.status = 'ingame';
-    } else if (req.body.status === 'decline') {
-        challenge.to.player.status = 'pending';
-        challenge.from.player.status = 'pending';
-    }
-
-    // send to all players that the challenge has been declined or accepted
-    sendToAllClients({
-        type: 'playerUpdate',
-        data: {
-            players: [
-                challenge.to.player,
-                challenge.from.player
-            ]
-        }
-    });
-
-    // create new game instance
-    challenges.delete(req.params.challengeId);
-
-    const data = {
-        type: 'challengeResponse',
-        data: {
-            status: req.body.status,
-            challengeId: req.params.challengeId,
-        }
-    };
-
-    challenge.to.client.send(data);
-    challenge.from.client.send(data);
+    updateChallenge(req.params.challengeId, challenge, req.body.status);
 });
 
 app.get("/active-players", authenticateToken, (req, res) => {
@@ -246,6 +215,14 @@ app.use('/peerjs', peerServer);
 
 peerServer.on('disconnect', (disconnectedClient) => {
     const playerDisconnected = users.get(disconnectedClient.getId());
+
+    const challengeId = getChallengeIdByPlayerId(playerDisconnected.player.id);
+    const challenge = challenges.get(challengeId);
+
+    if (challenge) {
+        updateChallenge(challengeId, challenge, 'decline');
+    }
+
     sendToAllClients({
         type: 'disconnect',
         data: playerDisconnected.player.id
@@ -318,18 +295,53 @@ function getUserByPlayerId(playerId) {
     return null;
 }
 
-function playerIsAlreadyInChallenge(playerId) {
+function getChallengeIdByPlayerId(playerId) {
     for (let[key, challenge] of challenges) {
         if (challenge.to.player.id === playerId || challenge.from.player.id === playerId) {
-            return true;
+            return key;
         }
     }
 
-    return false;
+    return null;
 }
 
 function sendToAllClients(data) {
     for (let [key, user] of users) {
         user.client.send(data);
     }
+}
+
+function updateChallenge(challengeId, challenge, status) {
+    if (status === 'accept') {
+        challenge.to.player.status = 'ingame';
+        challenge.from.player.status = 'ingame';
+    } else if (status === 'decline') {
+        challenge.to.player.status = 'pending';
+        challenge.from.player.status = 'pending';
+    }
+
+    // @todo create new game instance
+
+    challenges.delete(challengeId);
+
+    const data = {
+        type: 'challengeResponse',
+        data: {
+            status: status,
+            challengeId: challengeId,
+        }
+    };
+
+    challenge.to.client.send(data);
+    challenge.from.client.send(data);
+
+    sendToAllClients({
+        type: 'playerUpdate',
+        data: {
+            players: [
+                challenge.to.player,
+                challenge.from.player
+            ]
+        }
+    });
 }

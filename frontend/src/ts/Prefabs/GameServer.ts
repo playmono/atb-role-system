@@ -37,6 +37,9 @@ export default class GameServer {
             if (message.type === 'playerUpdate') {
                 this.updatePlayerList(message.data.players);
             }
+            if (message.type === 'challengeResponse') {
+                this.challengeResponse(message.data);
+            }
         });
 
         GameServer.instance = this;
@@ -130,8 +133,15 @@ export default class GameServer {
         });
     }
 
-    public declineChallenge(): void {
-        this.challengeId = null;
+    public challengeResponse(data): void {
+        if (this.challengeId !== data.challengeId) {
+            console.error('error. challenge id different');
+            return;
+        }
+
+        if (data.status === 'decline') {
+            this.challengeId = null;
+        }
     }
 
     public closeConnection(): void {

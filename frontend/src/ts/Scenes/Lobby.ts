@@ -72,24 +72,45 @@ export default class Lobby extends Phaser.Scene {
 
         // Rest of users
 
-        const startYPosition = this.cameras.main.height / 4;
+        const startYPosition = 70;
         let positionY = startYPosition;
         const offsetY = 50;
 
-        gameServer.playerList.forEach((player) => {
-            const challengeIconName = player.status === 'pending' ? 'challenge_icon' : 'waiting_icon';
-            const challengeIcon = this.add.sprite(25, positionY + 7, challengeIconName);
-            challengeIcon.scale = player.status === 'pending' ? 0.025 : 0.15;
-            const text = this.add.text(50, positionY, player.username + ' ' + player.rating);
+        if (gameServer.playerList.length === 0) {
+            const text = this.add.text(
+                this.cameras.main.centerX,
+                this.cameras.main.centerY - 100,
+                'Waiting for other players \nto connect...'
+            );
+            text.setOrigin(0.5);
+            Lobby.playerNamesList.add(text);
+        } else {
+            const text = this.add.text(this.cameras.main.centerX, positionY, 'Player list');
+            text.setOrigin(0.5);
+            Lobby.playerNamesList.add(text);
+        }
 
-            if (player.status === 'pending') {
+        positionY += 40;
+
+        gameServer.playerList.forEach((player) => {
+            let challengeIconName = '';
+            switch (player.status) {
+                case 'pending': challengeIconName = 'pending_icon'; break;
+                case 'challenged': challengeIconName = 'challenged_icon'; break;
+                case 'ingame': challengeIconName = 'ingame_icon'; break;
+            }
+            const challengeIcon = this.add.sprite(25, positionY + 7, challengeIconName);
+            challengeIcon.scale = 0.050;
+            const text = this.add.text(60, positionY, `${player.username} (${player.rating})`);
+
+            if (player.status === 'pending' && !gameServer.challengeId) {
                 challengeIcon.on("pointerdown", () => { this.challengePlayer(player); }, this);
                 challengeIcon.setInteractive();
                 text.setInteractive();
                 text.on("pointerdown", () => { this.challengePlayer(player); }, this);
             }
 
-            if (player.status === 'challenged') {
+            if (player.status === 'challenged' || gameServer.challengeId) {
                 text.setColor('#4a4949');
             }
 
@@ -103,16 +124,16 @@ export default class Lobby extends Phaser.Scene {
         Lobby.challengeGameObjects.clear(true, true);
         gameServer.challengePlayer(player)
         .then((message) => {
-            message = `Waiting for ${player.username} ${player.rating} to accept your challenge`;
-            const text = this.add.text(20, 280, [message]);
+            message = `Waiting for ${player.username} (${player.rating})\nto accept your challenge`;
+            const text = this.add.text(this.cameras.main.centerX, 450, [message]);
+            text.setOrigin(0.5);
             Lobby.challengeGameObjects.add(text);
 
-            const declineButton = this.add.image(this.cameras.main.centerX, 330, 'decline_button');
+            const declineButton = this.add.image(this.cameras.main.centerX, 520, 'decline_button');
             declineButton.setInteractive();
             declineButton.scale = 0.25;
             declineButton.on("pointerdown", () => { gameServer.respondChallenge('decline'); }, this);
             Lobby.challengeGameObjects.add(declineButton);
-
         })
         .catch((message) => {
             const text = this.add.text(20, 280, [message]);
@@ -124,14 +145,15 @@ export default class Lobby extends Phaser.Scene {
         const gameServer = new GameServer();
 
         Lobby.challengeGameObjects.clear(true, true);
-        const text = this.add.text(20, 280, ['You have challenge from', `${player.username} ${player.rating}`]);
+        const text = this.add.text(this.cameras.main.centerX, 450, `You have a new challenge from\n${player.username} (${player.rating})`);
+        text.setOrigin(0.5);
 
-        const acceptButton = this.add.image(this.cameras.main.centerX - 50, 350, 'accept_button');
+        const acceptButton = this.add.image(this.cameras.main.centerX - 50, 520, 'accept_button');
         acceptButton.setInteractive();
         acceptButton.scale = 0.25;
         acceptButton.on("pointerdown", () => { gameServer.respondChallenge('accept'); }, this);
 
-        const declineButton = this.add.image(this.cameras.main.centerX + 50, 350, 'decline_button');
+        const declineButton = this.add.image(this.cameras.main.centerX + 50, 520, 'decline_button');
         declineButton.setInteractive();
         declineButton.scale = 0.25;
         declineButton.on("pointerdown", () => { gameServer.respondChallenge('decline'); }, this);
@@ -141,34 +163,12 @@ export default class Lobby extends Phaser.Scene {
 
     private challengeResponse(data: any): void {
         const gameServer = new GameServer();
-        if (gameServer.challengeId !== data.challengeId) {
-            console.error('error. challenge id different');
-            return;
-        }
 
-        switch (data.status) {
-            case 'accept':
-                this.scene.start(Battlefield.Name);
-            break;
-            case 'decline':
-                gameServer.declineChallenge();
-                Lobby.challengeGameObjects.clear(true, true);
-            break;
-            default:
-                throw Error(`Status of challenge invalid: ${data.status}`);
+        Lobby.challengeGameObjects.clear(true, true);
+
+        if (data.status === 'accept') {
+            gameServer.peer.socket.off('message');
+            this.scene.start(Battlefield.Name);
         }
     }
-    /*
-    private playerUpdate(data: any): void {
-        const gameServer = new GameServer();
-        switch (data.status) {
-            case 'pending':
-                gameServer.playerList.forEach((player) => {
-                    if (data.players.includes(player.id)) {
-                        
-                    }
-                })
-        }
-    }
-    */
 }
