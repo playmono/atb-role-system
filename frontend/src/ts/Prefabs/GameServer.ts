@@ -1,4 +1,4 @@
-import Peer from "peerjs";
+import Peer, { DataConnection } from "peerjs";
 import { v4 as uuidv4 } from 'uuid';
 
 export default class GameServer {
@@ -8,6 +8,7 @@ export default class GameServer {
     playerList = [];
     token: string;
     challengeId: string = null;
+    game = null;
 
     constructor(auth_token?: string) {
         if (GameServer.instance && !auth_token) {
@@ -21,14 +22,15 @@ export default class GameServer {
             port: parseInt(process.env.APP_PORT),
             path: '/peerjs',
             token: auth_token,
-            secure: process.env.APP_PROTOCOL === 'https'
+            secure: process.env.APP_PROTOCOL === 'https',
+            debug: 3
         });
 
         this.peer.socket.on('message', (message) => {
-            if (message.type === 'connect') {
+            if (message.type === 'gameConnect') {
                 this.addToPlayerList(message.data);
             }
-            if (message.type === 'disconnect') {
+            if (message.type === 'gameDisconnect') {
                 this.removeFromPlayerList(message.data);
             }
             if (message.type === 'challengeOffer') {
@@ -72,7 +74,7 @@ export default class GameServer {
             if (player.id !== this.player.id) {
                 this.playerList.push(player);
             }
-        })
+        });
     }
 
     public addToPlayerList(player: any): void {
@@ -89,7 +91,7 @@ export default class GameServer {
             if (found !== -1) {
                 this.playerList.splice(found, 1, player);
             }
-        })
+        });
     }
 
     public challengePlayer(player: any): Promise<string> {
@@ -121,7 +123,7 @@ export default class GameServer {
         });
     }
 
-    public async respondChallenge(status: string): Promise<void> {
+    public async respondChallenge(status: string, callback?: Function): Promise<void> {
         const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL + ':' + process.env.APP_PORT;
         const response = await fetch(`${url}/challenge/${this.challengeId}`, {
             method: "PUT",
@@ -131,17 +133,39 @@ export default class GameServer {
             },
             body: JSON.stringify({status: status})
         });
+        const responseData = await response.json();
+        if (responseData.data.status === 'accept') {
+            this.game = responseData.data.game;
+            const con = this.openConnection(this.getOppositeGamePlayer().peerId);
+            con.on('open', () => {
+                callback();
+            });
+            con.on("error", (err) => {
+                console.log(err);
+            });
+            con.on('close', () => {
+                //endCall()
+            });
+        } else {
+            callback();
+        }
     }
 
-    public challengeResponse(data): void {
-        if (this.challengeId !== data.challengeId) {
+    public challengeResponse(data: any): void {
+        if (this.challengeId !== data.game.id) {
             console.error('error. challenge id different');
             return;
         }
 
-        if (data.status === 'decline') {
-            this.challengeId = null;
-        }
+        this.challengeId = null;
+    }
+
+    public getOppositeGamePlayer() {
+        return this.game.gamePlayers.find((gamePlayer) => gamePlayer.player.id !== this.player.id);
+    }
+
+    public openConnection(peerId: string) {
+        return this.peer.connect(peerId);
     }
 
     public closeConnection(): void {

@@ -8,6 +8,7 @@ import Player from "./models/Player.js";
 import passwordHash from "pbkdf2-password-hash";
 import jwt from "jsonwebtoken";
 import User from "./models/User.js";
+import Game from "./models/Game.js";
 
 const users = new Map();
 const challenges = new Map();
@@ -169,7 +170,14 @@ app.put("/challenge/:challengeId", authenticateToken, (req, res) => {
         return sendError(res, {code: 403, message: 'Anoter player cannot accept the challenge'});
     }
 
-    updateChallenge(req.params.challengeId, challenge, req.body.status);
+    const data = updateChallenge(req.params.challengeId, challenge, req.body.status);
+
+    res.status(200).send({
+        data: {
+            status: data.data.status,
+            game: data.data.game
+        }
+    });
 });
 
 app.get("/active-players", authenticateToken, (req, res) => {
@@ -224,7 +232,7 @@ peerServer.on('disconnect', (disconnectedClient) => {
     }
 
     sendToAllClients({
-        type: 'disconnect',
+        type: 'gameDisconnect',
         data: playerDisconnected.player.id
     });
     users.delete(disconnectedClient.getId());
@@ -257,7 +265,7 @@ peerServer.on('connection', client => {
     .then((player) => {
         player.hidePassword();
         sendToAllClients({
-            type: 'connect',
+            type: 'gameConnect',
             data: player
         });
         users.set(client.id, new User(player, client));
@@ -266,6 +274,14 @@ peerServer.on('connection', client => {
         console.log(error);
         client.socket.close();
     });
+});
+
+peerServer.on('error', (error) => {
+    console.log('Error on peerServer', error.message);
+});
+
+peerServer.on('message', (client, message) => {
+    console.log('Message on peerServer', message);
 });
 
 function authenticateToken(req, res, callback) {
@@ -320,7 +336,26 @@ function updateChallenge(challengeId, challenge, status) {
         challenge.from.player.status = 'pending';
     }
 
-    // @todo create new game instance
+    const game = Game.createGame({
+        id: challengeId
+    });
+
+    if (status === 'accept') {
+        game.addGamePlayer({
+            player: challenge.to.player,
+            peerId: challenge.to.client.id
+        });
+        game.addGamePlayer({
+            player: challenge.from.player,
+            peerId: challenge.from.client.id
+        });
+        database.save(game);
+
+        // quick fix to avoid circular reference
+        game.gamePlayers.forEach((gamePlayer) => {
+            delete(gamePlayer.game);
+        });
+    }
 
     challenges.delete(challengeId);
 
@@ -328,12 +363,12 @@ function updateChallenge(challengeId, challenge, status) {
         type: 'challengeResponse',
         data: {
             status: status,
-            challengeId: challengeId,
+            game: game,
         }
     };
 
-    challenge.to.client.send(data);
     challenge.from.client.send(data);
+    challenge.to.client.send(data);
 
     sendToAllClients({
         type: 'playerUpdate',
@@ -344,4 +379,6 @@ function updateChallenge(challengeId, challenge, status) {
             ]
         }
     });
+
+    return data;
 }

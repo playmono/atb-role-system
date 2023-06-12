@@ -24,10 +24,10 @@ export default class Lobby extends Phaser.Scene {
         const gameServer = new GameServer();
 
         gameServer.peer.socket.on('message', (message) => {
-            if (message.type === 'connect') {
+            if (message.type === 'gameConnect') {
                 this.renderPlayerList();
             }
-            if (message.type === 'disconnect') {
+            if (message.type === 'gameDisconnect') {
                 this.renderPlayerList();
             }
             if (message.type === 'challengeOffer') {
@@ -64,7 +64,7 @@ export default class Lobby extends Phaser.Scene {
         const text = this.add.text(
             this.cameras.main.width - 10,
             10,
-            gameServer.player.username + ' ' + gameServer.player.rating,
+            `${gameServer.player.username} (${gameServer.player.rating})`,
             { color: '#00a6ed', align: 'right' }
         )
         .setOrigin(1, 0);
@@ -105,9 +105,9 @@ export default class Lobby extends Phaser.Scene {
 
             if (player.status === 'pending' && !gameServer.challengeId) {
                 challengeIcon.on("pointerdown", () => { this.challengePlayer(player); }, this);
+                text.on("pointerdown", () => { this.challengePlayer(player); }, this);
                 challengeIcon.setInteractive();
                 text.setInteractive();
-                text.on("pointerdown", () => { this.challengePlayer(player); }, this);
             }
 
             if (player.status === 'challenged' || gameServer.challengeId) {
@@ -128,11 +128,14 @@ export default class Lobby extends Phaser.Scene {
             const text = this.add.text(this.cameras.main.centerX, 450, [message]);
             text.setOrigin(0.5);
             Lobby.challengeGameObjects.add(text);
-
             const declineButton = this.add.image(this.cameras.main.centerX, 520, 'decline_button');
             declineButton.setInteractive();
             declineButton.scale = 0.25;
-            declineButton.on("pointerdown", () => { gameServer.respondChallenge('decline'); }, this);
+            declineButton.on("pointerdown", () => {
+                gameServer.respondChallenge('decline', () => {
+                    Lobby.challengeGameObjects.clear(true, true);
+                });
+            }, this);
             Lobby.challengeGameObjects.add(declineButton);
         })
         .catch((message) => {
@@ -143,7 +146,6 @@ export default class Lobby extends Phaser.Scene {
 
     private renderChallengeReceived(player: any): void {
         const gameServer = new GameServer();
-
         Lobby.challengeGameObjects.clear(true, true);
         const text = this.add.text(this.cameras.main.centerX, 450, `You have a new challenge from\n${player.username} (${player.rating})`);
         text.setOrigin(0.5);
@@ -151,24 +153,26 @@ export default class Lobby extends Phaser.Scene {
         const acceptButton = this.add.image(this.cameras.main.centerX - 50, 520, 'accept_button');
         acceptButton.setInteractive();
         acceptButton.scale = 0.25;
-        acceptButton.on("pointerdown", () => { gameServer.respondChallenge('accept'); }, this);
+
+        acceptButton.on("pointerdown", () => {
+            gameServer.respondChallenge('accept', () => {
+                this.scene.start(Battlefield.Name);
+            });
+        }, this);
 
         const declineButton = this.add.image(this.cameras.main.centerX + 50, 520, 'decline_button');
         declineButton.setInteractive();
         declineButton.scale = 0.25;
-        declineButton.on("pointerdown", () => { gameServer.respondChallenge('decline'); }, this);
+        declineButton.on("pointerdown", () => {
+            gameServer.respondChallenge('decline', () => {
+                Lobby.challengeGameObjects.clear(true, true);
+            });
+        }, this);
 
         Lobby.challengeGameObjects.addMultiple([text, acceptButton, declineButton]);
     }
 
     private challengeResponse(data: any): void {
-        const gameServer = new GameServer();
-
         Lobby.challengeGameObjects.clear(true, true);
-
-        if (data.status === 'accept') {
-            gameServer.peer.socket.off('message');
-            this.scene.start(Battlefield.Name);
-        }
     }
 }

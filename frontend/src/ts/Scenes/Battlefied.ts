@@ -3,6 +3,7 @@ import Hero from "../Prefabs/Characters/Ally";
 import Enemy from "../Prefabs/Characters/Enemy";
 import Utilities from "../Utilities";
 import Experience from "../Prefabs/Experience";
+import GameServer from "../Prefabs/GameServer";
 
 export default class Battlefield extends Phaser.Scene {
     static Name = "Battlefield";
@@ -22,6 +23,25 @@ export default class Battlefield extends Phaser.Scene {
 
     public create(): void {
         Utilities.LogSceneMethodEntry("Battlefield", "create");
+        const gameServer = new GameServer();
+
+        // Enemy Info
+        this.add.text(
+            this.cameras.main.centerX,
+            20,
+            `${gameServer.getOppositeGamePlayer().player.username} (${gameServer.getOppositeGamePlayer().player.rating})`,
+            { color: '#ed4b00', align: 'right' }
+        )
+        .setOrigin(0.5);
+
+         // User Info
+         this.add.text(
+             this.cameras.main.centerX,
+             this.cameras.main.height - 20,
+             `${gameServer.player.username} (${gameServer.player.rating})`,
+             { color: '#00a6ed', align: 'right' }
+         )
+         .setOrigin(0.5);
 
         Battlefield.enemyGroup = this.physics.add.group();
         Battlefield.allyGroup = this.physics.add.group();

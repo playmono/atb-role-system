@@ -14,7 +14,6 @@ export default class HealthBar extends CharacterBar {
     }
 
     update(): void {
-        console.log(this.character.sprite.getBottomCenter());
         let width = CharacterBar.width * this.character.healthCurrent / this.character.healthMax;
 
         if (width < 0) {

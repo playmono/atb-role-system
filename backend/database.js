@@ -2,12 +2,17 @@ import fileSystem from "fs";
 import sqlite3 from "sqlite3";
 import { DB_NAME } from "./constants.js";
 import Player from "./models/Player.js";
+import Game from "./models/Game.js";
+
+const db = new sqlite3.Database(DB_NAME);
 
 const database = {
     save: function(object) {
         switch (true) {
             case object instanceof Player:
-                return this.savePlayer(object)
+                return this.savePlayer(object);
+            case object instanceof Game:
+                return this.saveGame(object);
         }
     },
 
@@ -25,6 +30,39 @@ const database = {
             });
             db.close();
         });
+    },
+
+    saveGame: function(game) {
+        const promises =  [];
+        let promiseQuery = new Promise ((resolve, reject) => {
+            const db = new sqlite3.Database(DB_NAME);
+            db.run('INSERT INTO game VALUES (?, ?, ?)', [
+                game.id,
+                game.started_at,
+                game.finished_at
+            ], (error) => {
+                error? reject(error) : resolve(game);
+            });
+            db.close();
+        });
+        promises.push(promiseQuery);
+        game.gamePlayers.forEach((gamePlayer) => {
+            promiseQuery = new Promise((resolve, reject) => {
+                const db = new sqlite3.Database(DB_NAME);
+                db.run('INSERT INTO game_player VALUES (?, ?, ?, ?)', [
+                    gamePlayer.game.id,
+                    gamePlayer.player.id,
+                    gamePlayer.peerId,
+                    gamePlayer.result
+                ], (error) => {
+                    error? reject(error) : resolve(gamePlayer);
+                });
+                db.close();
+            });
+            promises.push(promiseQuery);
+        });
+
+        return Promise.all(promises);
     },
 
     findPlayerByUsername: function(username) {
@@ -79,7 +117,7 @@ const database = {
         db.serialize(() => {
             this.executeSchemaQuery(db, 'CREATE TABLE player (id TEXT PRIMARY KEY, username TEXT, password TEXT, rating INTEGER, created_at TEXT) STRICT');
             this.executeSchemaQuery(db, 'CREATE TABLE game (id TEXT PRIMARY KEY, started_at TEXT, finished_at TEXT) STRICT');
-            this.executeSchemaQuery(db, 'CREATE TABLE player_game (id_game TEXT, id_player TEXT, id_peer TEXT, result TEXT, PRIMARY KEY (id_game, id_player)) STRICT');
+            this.executeSchemaQuery(db, 'CREATE TABLE game_player (id_game TEXT, id_player TEXT, id_peer TEXT, result TEXT, PRIMARY KEY (id_game, id_player)) STRICT');
         });
         db.close();
     },
