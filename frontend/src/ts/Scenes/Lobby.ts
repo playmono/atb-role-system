@@ -41,6 +41,14 @@ export default class Lobby extends Phaser.Scene {
             }
         });
 
+        gameServer.peer.on('connection', (conn) => {
+            conn.on('data', (data: any) => {
+                if (data.type === 'startGame') {
+                    this.scene.start(Battlefield.Name);
+                }
+            })
+        });
+
         const startYPosition = this.cameras.main.height / 4;
 		const fontSize = 25;
 

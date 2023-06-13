@@ -9,6 +9,7 @@ export default class GameServer {
     token: string;
     challengeId: string = null;
     game = null;
+    gameConnection: DataConnection = null;
 
     constructor(auth_token?: string) {
         if (GameServer.instance && !auth_token) {
@@ -42,6 +43,10 @@ export default class GameServer {
             if (message.type === 'challengeResponse') {
                 this.challengeResponse(message.data);
             }
+        });
+
+        this.peer.on('connection', (conn) => {
+            this.gameConnection = conn;
         });
 
         GameServer.instance = this;
@@ -136,14 +141,17 @@ export default class GameServer {
         const responseData = await response.json();
         if (responseData.data.status === 'accept') {
             this.game = responseData.data.game;
-            const con = this.openConnection(this.getOppositeGamePlayer().peerId);
-            con.on('open', () => {
+            this.gameConnection = this.openConnection(this.getOppositeGamePlayer().peerId);
+            this.gameConnection.on('open', () => {
                 callback();
+                this.gameConnection.send({
+                    type: 'startGame'
+                })
             });
-            con.on("error", (err) => {
+            this.gameConnection.on("error", (err) => {
                 console.log(err);
             });
-            con.on('close', () => {
+            this.gameConnection.on('close', () => {
                 //endCall()
             });
         } else {
@@ -156,7 +164,7 @@ export default class GameServer {
             console.error('error. challenge id different');
             return;
         }
-
+        this.game = data.game;
         this.challengeId = null;
     }
 
