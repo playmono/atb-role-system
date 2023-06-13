@@ -10,6 +10,7 @@ export default class Battlefield extends Phaser.Scene {
     static allyGroup: Phaser.GameObjects.Group;
     static enemyGroup: Phaser.GameObjects.Group;
     static turnElements: Phaser.GameObjects.Group;
+    public battlefieldIsReady = false;
 
     public preload(): void {
         this.loadSfx();
@@ -24,6 +25,8 @@ export default class Battlefield extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("Battlefield", "create");
         const gameServer = new GameServer();
+
+        this.configureListeners();
 
         // Enemy Info
         this.add.text(
@@ -47,30 +50,6 @@ export default class Battlefield extends Phaser.Scene {
         Battlefield.allyGroup = this.physics.add.group();
         Battlefield.turnElements = this.physics.add.group();
 
-        const hero1 = new Hero()
-        hero1.render(this, Columns.FIRST_COLUMN);
-        Battlefield.allyGroup.add(hero1.sprite);
-
-        const hero2 = new Hero();
-        hero2.render(this, Columns.SECOND_COLUMN);
-        Battlefield.allyGroup.add(hero2.sprite);
-
-        const hero3 = new Hero();
-        hero3.render(this, Columns.THIRD_COLUMN);
-        Battlefield.allyGroup.add(hero3.sprite);
-
-        const enemy1 = new Enemy();
-        enemy1.render(this, Columns.FIRST_COLUMN);
-        Battlefield.enemyGroup.add(enemy1.sprite);
-
-        const enemy2 = new Enemy();
-        enemy2.render(this, Columns.SECOND_COLUMN);
-        Battlefield.enemyGroup.add(enemy2.sprite);
-
-        const enemy3 = new Enemy();
-        enemy3.render(this, Columns.THIRD_COLUMN);
-        Battlefield.enemyGroup.add(enemy3.sprite);
-
         const experienceField = new Phaser.Geom.Rectangle(
             20,
             this.cameras.main.centerY - 100,
@@ -91,6 +70,86 @@ export default class Battlefield extends Phaser.Scene {
             gameObject.x = gameObject.__initialX;
             gameObject.y = gameObject.__initialY;
         });
+
+        gameServer.gameConnection.send({
+            type: 'battlefieldLoaded',
+        });
+
+        if (this.battlefieldIsReady) {
+            this.loadHeros();
+        }
+    }
+
+    public loadHeros(): void {
+        const gameServer = new GameServer();
+
+        const hero1 = new Hero(Math.random())
+        hero1.render(this, Columns.FIRST_COLUMN);
+        Battlefield.allyGroup.add(hero1.sprite);
+
+        const hero2 = new Hero(Math.random());
+        hero2.render(this, Columns.SECOND_COLUMN);
+        Battlefield.allyGroup.add(hero2.sprite);
+
+        const hero3 = new Hero(Math.random());
+        hero3.render(this, Columns.THIRD_COLUMN);
+        Battlefield.allyGroup.add(hero3.sprite);
+
+        gameServer.gameConnection.send({
+            type: 'enemySetup',
+            data: [
+                {
+                    gender: hero1.gender,
+                    column: hero1.column,
+                },
+                {
+                    gender: hero2.gender,
+                    column: hero2.column,
+                },
+                {
+                    gender: hero3.gender,
+                    column: hero3.column
+                }
+            ]
+        })
+    }
+
+    public configureListeners(): void {
+        const gameServer = new GameServer();
+
+        gameServer.gameConnection.on('data', (data: any) => {
+            console.log('Received on battlefield', data);
+            if (data.type === 'battlefieldLoaded') {
+                this.loadHeros();
+            }
+            if (data.type === 'enemySetup') {
+                this.setEnemySetup(data.data);
+            }
+            if (data.type === 'characterReceivedSkill') {
+                this.characterReceivedSkill(data.data);
+            }
+        });
+    }
+
+    private setEnemySetup(data: any): void {
+        data.forEach((enemyData: any) => {
+            const enemy = new Enemy(enemyData.gender);
+            enemy.render(this, enemyData.column);
+            Battlefield.enemyGroup.add(enemy.sprite);
+        });
+    }
+
+    private characterReceivedSkill(data: any): void {
+        let character = null;
+        if (data.characterType === 'enemy') {
+            character = Battlefield.allyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.column);
+        } else  {
+            character = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.column);
+        }
+
+        if (character) {
+            character.__parentClass.receiveSkill(data.damage);
+        }
     }
 
     private loadSfx(): void {

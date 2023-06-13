@@ -29,8 +29,8 @@ export default abstract class Character {
     gender: number;
     topCircle: Phaser.Geom.Circle;
 
-    constructor() {
-        this.gender = Math.random();
+    constructor(gender: number) {
+        this.gender = gender;
         this.healthBar = new HealthBar(this);
         this.atbBar = new AtbBar(this);
         this.setRole(Novice);
@@ -73,7 +73,7 @@ export default abstract class Character {
             .setOrigin(0.5)
             .setInteractive();
 
-            this.sprite.body.setSize(100, 300);
+        this.sprite.body.setSize(100, 300);
 
         // Novices in spritesheet are looking in the other direction, so flip them if column < 2
         this.sprite.flipX = column > 1;
@@ -128,7 +128,7 @@ export default abstract class Character {
         this.currentRole.addExperience(experience);
     }
 
-    protected receiveSkill(damage: number): void {
+    public receiveSkill(damage: number): void {
         const anim = this.sprite.play(this.gender > 0.5 ? 'novice_boy_hurt' : 'novice_girl_hurt');
 
         this.sprite.on(

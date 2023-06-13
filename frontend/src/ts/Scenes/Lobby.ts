@@ -43,10 +43,15 @@ export default class Lobby extends Phaser.Scene {
 
         gameServer.peer.on('connection', (conn) => {
             conn.on('data', (data: any) => {
+                console.log("Received on lobby", data);
                 if (data.type === 'startGame') {
                     this.scene.start(Battlefield.Name);
                 }
-            })
+                if (data.type === "battlefieldLoaded") {
+                    const battleFieldScene = this.scene.get(Battlefield.Name) as any;
+                    battleFieldScene.battlefieldIsReady = true;
+                }
+            });
         });
 
         const startYPosition = this.cameras.main.height / 4;

@@ -2,6 +2,7 @@ import Battlefield from "../Scenes/Battlefied";
 import Ally from "./Characters/Ally";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 import Experience from "./Experience";
+import GameServer from "./GameServer";
 
 export default class Skill {
     ally: Ally;
@@ -120,6 +121,16 @@ export default class Skill {
         */
 
         appliedOn.receiveSkill(skillType.damage);
+
+        const gameServer = new GameServer();
+        gameServer.gameConnection.send({
+            type: 'characterReceivedSkill',
+            data: {
+                characterType: appliedOn instanceof Ally ? 'ally' : 'enemy',
+                column: appliedOn.column,
+                damage: skillType.damage
+            }
+        })
 
         if (this.ally.currentRole.currentExperience >= this.ally.currentRole.getExperienceToNextLevel()) {
             this.ally.levelUp();

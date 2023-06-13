@@ -24,7 +24,7 @@ export default class GameServer {
             path: '/peerjs',
             token: auth_token,
             secure: process.env.APP_PROTOCOL === 'https',
-            debug: 3
+            //debug: 3
         });
 
         this.peer.socket.on('message', (message) => {
@@ -46,7 +46,9 @@ export default class GameServer {
         });
 
         this.peer.on('connection', (conn) => {
-            this.gameConnection = conn;
+            conn.on('open', () => {
+                this.gameConnection = conn;
+            });
         });
 
         GameServer.instance = this;
@@ -141,17 +143,16 @@ export default class GameServer {
         const responseData = await response.json();
         if (responseData.data.status === 'accept') {
             this.game = responseData.data.game;
-            this.gameConnection = this.openConnection(this.getOppositeGamePlayer().peerId);
-            this.gameConnection.on('open', () => {
+            const conn = this.peer.connect(this.getOppositeGamePlayer().peerId);
+            conn.on('open', () => {
+                this.gameConnection = conn;
+                conn.send({type: 'startGame'});
                 callback();
-                this.gameConnection.send({
-                    type: 'startGame'
-                })
             });
-            this.gameConnection.on("error", (err) => {
+            conn.on("error", (err) => {
                 console.log(err);
             });
-            this.gameConnection.on('close', () => {
+            conn.on('close', () => {
                 //endCall()
             });
         } else {
@@ -170,10 +171,6 @@ export default class GameServer {
 
     public getOppositeGamePlayer() {
         return this.game.gamePlayers.find((gamePlayer) => gamePlayer.player.id !== this.player.id);
-    }
-
-    public openConnection(peerId: string) {
-        return this.peer.connect(peerId);
     }
 
     public closeConnection(): void {
