@@ -33,7 +33,7 @@ export default class Ally extends Character {
             const difference = i * Math.PI * 1.15 / 4;
             angle = i % 2 === 0 ? angle += difference : angle -= difference;
             const circumferencePoint = Phaser.Geom.Circle.CircumferencePoint(this.topCircle, angle);
-            const sprite = skillObject.render(skillType, skillLevel, circumferencePoint.x, circumferencePoint.y);
+            const sprite = skillObject.renderAllySkill(skillType, skillLevel, circumferencePoint.x, circumferencePoint.y);
 
             this.turnElements.add(sprite);
         }

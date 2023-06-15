@@ -1,5 +1,6 @@
 import Battlefield from "../Scenes/Battlefied";
 import Ally from "./Characters/Ally";
+import { SkillsMap } from "./Constants";
 import { DamageType, AreaOfEffect, EffectRange } from "./Enums";
 import Experience from "./Experience";
 import GameServer from "./GameServer";
@@ -29,7 +30,7 @@ export default class Skill {
         radius: 30
     };
 
-    public constructor(ally: Ally) {
+    public constructor(ally?: Ally) {
         this.ally = ally;
     }
 
@@ -37,9 +38,8 @@ export default class Skill {
         // To override
     }
 
-    public render(skillType: typeof Skill, skillLevel: number, x: number, y: number): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
-        // CAREFUL: this.ally.sprite maybe doesnt exist
-        this.sprite = this.ally.sprite.scene.physics.add.sprite(
+    public renderIcon(scene: Phaser.Scene, x: number, y: number, skillType: typeof Skill, group?: Phaser.GameObjects.Group) {
+        this.sprite = scene.physics.add.sprite(
             x,
             y,
             skillType.spriteName
@@ -52,20 +52,30 @@ export default class Skill {
         this.sprite['__parentClass'] = this;
         this.sprite['__typeOfParentClass'] = skillType;
 
-        this.sprite['__initialX'] = x;
-        this.sprite['__initialY'] = y;
-
-        Battlefield.turnElements.add(this.sprite);
-
-        this.configureOverlap();
-
         const circle = this.sprite.scene.make.graphics({})
         circle.fillStyle(0xffffff);
         circle.fillCircle(this.sprite.x, this.sprite.y, Skill.initialValues.radius);
         this.mask = circle.createGeometryMask();
         this.sprite.setMask(this.mask);
 
-        Battlefield.turnElements.add(circle);
+        if (group) {
+            group.addMultiple([this.sprite, circle]);
+        }
+
+        return this.sprite;
+    }
+
+    public renderAllySkill(skillType: typeof Skill, skillLevel: number, x: number, y: number): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
+        if (!this.ally) {
+            throw Error('Cannot render an ally skill without ally.');
+        }
+
+        this.renderIcon(this.ally.sprite.scene, x, y, skillType, Battlefield.turnElements);
+
+        this.sprite['__initialX'] = x;
+        this.sprite['__initialY'] = y;
+
+        this.configureOverlap();
 
         if (skillLevel > this.ally.currentRole.level) {
             this.sprite.setAlpha(0.2);
@@ -126,9 +136,10 @@ export default class Skill {
         gameServer.gameConnection.send({
             type: 'characterReceivedSkill',
             data: {
+                from: this.ally.column,
+                to: appliedOn.column,
                 characterType: appliedOn instanceof Ally ? 'ally' : 'enemy',
-                column: appliedOn.column,
-                damage: skillType.damage
+                skillType: skillType.className
             }
         })
 

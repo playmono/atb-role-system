@@ -4,6 +4,10 @@ import Enemy from "../Prefabs/Characters/Enemy";
 import Utilities from "../Utilities";
 import Experience from "../Prefabs/Experience";
 import GameServer from "../Prefabs/GameServer";
+import Trail from "../Prefabs/Trail";
+import Skill from "../Prefabs/Skill";
+import Attack from "../Prefabs/Skills/Attack";
+import { SkillsMap } from "../Prefabs/Constants";
 
 export default class Battlefield extends Phaser.Scene {
     static Name = "Battlefield";
@@ -11,6 +15,8 @@ export default class Battlefield extends Phaser.Scene {
     static enemyGroup: Phaser.GameObjects.Group;
     static turnElements: Phaser.GameObjects.Group;
     public battlefieldIsReady = false;
+    public trail: Trail;
+    public enemyTrail: Trail;
 
     public preload(): void {
         this.loadSfx();
@@ -22,9 +28,16 @@ export default class Battlefield extends Phaser.Scene {
         this.loadWhiteMageAnimations();
     }
 
+    public update(): void {
+        this.trail.keepTrail();
+        this.enemyTrail.keepTrail();
+    }
+
     public create(): void {
         Utilities.LogSceneMethodEntry("Battlefield", "create");
         const gameServer = new GameServer();
+        this.trail = new Trail(this, 0x00FFFF, 1);
+        this.enemyTrail = new Trail(this, 0xFF0000, 0.5);
 
         this.configureListeners();
 
@@ -56,19 +69,21 @@ export default class Battlefield extends Phaser.Scene {
             this.cameras.main.width - 50,
             100
         );
-        //this.add.graphics({ lineStyle: { color: 0x00ff00 } }).strokeRectShape(rectangle);
+        //this.add.graphics({ lineStyle: { color: 0x00ff00 } }).strokeRectShape(experienceField);
 
         const experience = new Experience(experienceField);
         experience.render(this);
 
-        this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
             gameObject.x = dragX;
             gameObject.y = dragY;
+            this.trail.createPoints(dragX, dragY);
         });
 
-        this.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
+        this.input.on('dragend',  (pointer, gameObject, dragX, dragY) => {
             gameObject.x = gameObject.__initialX;
             gameObject.y = gameObject.__initialY;
+            this.trail.stopTrail();
         });
 
         gameServer.gameConnection.send({
@@ -111,7 +126,7 @@ export default class Battlefield extends Phaser.Scene {
                     column: hero3.column
                 }
             ]
-        })
+        });
     }
 
     public configureListeners(): void {
@@ -140,15 +155,40 @@ export default class Battlefield extends Phaser.Scene {
     }
 
     private characterReceivedSkill(data: any): void {
-        let character = null;
+        let to = null;
         if (data.characterType === 'enemy') {
-            character = Battlefield.allyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.column);
+            to = Battlefield.allyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.to);
         } else  {
-            character = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.column);
+            to = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.to);
         }
 
-        if (character) {
-            character.__parentClass.receiveSkill(data.damage);
+        const from = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.from) as any;
+
+        if (to) {
+            const skillName = data.skillType;
+            const skillType = SkillsMap[skillName];
+            const skill = new skillType();
+            const sprite = skill.renderIcon(this, from.x, from.y, skillType);
+            sprite.setAlpha(0.7);
+            const mask = sprite.mask as any;
+
+            this.tweens.add({
+                targets: skill.sprite,
+                x: to.x,
+                y: to.y,
+                duration: 500,
+                ease: 'Cubic.in',
+                onUpdate: () => {
+                    mask.geometryMask.clear();
+                    mask.geometryMask.fillCircle(sprite.x, sprite.y, Skill.initialValues.radius);
+                    this.enemyTrail.createPoints(sprite.x, sprite.y);
+                },
+                onComplete: () => {
+                    to.__parentClass.receiveSkill(skillType.damage);
+                    sprite.destroy();
+                    mask.destroy();
+                }
+              });
         }
     }
 
