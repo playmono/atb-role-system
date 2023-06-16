@@ -7,7 +7,7 @@ import GameServer from "../Prefabs/GameServer";
 import Trail from "../Prefabs/Trail";
 import Skill from "../Prefabs/Skill";
 import Attack from "../Prefabs/Skills/Attack";
-import { SkillsMap } from "../Prefabs/Constants";
+import { RolesMap, SkillsMap } from "../Prefabs/Constants";
 
 export default class Battlefield extends Phaser.Scene {
     static Name = "Battlefield";
@@ -143,6 +143,9 @@ export default class Battlefield extends Phaser.Scene {
             if (data.type === 'characterReceivedSkill') {
                 this.characterReceivedSkill(data.data);
             }
+            if (data.type === 'enemyStatus') {
+                this.enemyStatusChanged(data.data);
+            }
         });
     }
 
@@ -165,8 +168,7 @@ export default class Battlefield extends Phaser.Scene {
         const from = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.from) as any;
 
         if (to) {
-            const skillName = data.skillType;
-            const skillType = SkillsMap[skillName];
+            const skillType = SkillsMap[data.skillType];
             const skill = new skillType();
             const sprite = skill.renderIcon(this, from.x, from.y, skillType);
             sprite.setAlpha(0.7);
@@ -189,6 +191,24 @@ export default class Battlefield extends Phaser.Scene {
                     mask.destroy();
                 }
               });
+        }
+    }
+
+    private enemyStatusChanged(data): void {
+        const from = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.from) as any;
+
+        if (from) {
+            from.__parentClass.currentRole.destroy();
+            if (data.level) {
+                from.__parentClass.currentRole.level = data.level;
+            }
+            if (data.role) {
+                const roleType = RolesMap[data.role];
+                if (roleType) {
+                    from.__parentClass.setRole(roleType);
+                }
+            }
+            from.__parentClass.renderRole(this);
         }
     }
 

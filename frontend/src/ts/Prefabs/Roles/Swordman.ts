@@ -10,6 +10,7 @@ import Provoke from "../Skills/Provoke";
 import Ragnarok from "../Skills/Ragnarok";
 
 export default class Swordman extends Role {
+    static readonly className = "Swordman";
     static readonly icon = 'swordman_icon';
     static readonly hexColor = 0xff0000;
     static readonly idleAnimation = 'swordman_idle';

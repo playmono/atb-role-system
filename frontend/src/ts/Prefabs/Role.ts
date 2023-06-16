@@ -1,6 +1,8 @@
 import Character from "./Character";
+import Ally from "./Characters/Ally";
 import { RolesMap } from "./Constants";
 import { EffectRange } from "./Enums";
+import GameServer from "./GameServer";
 import Skill from "./Skill";
 
 export default abstract class Role {
@@ -28,8 +30,7 @@ export default abstract class Role {
         character: Character,
         role: Role,
         x: number,
-        y: number,
-        turnElements?: Phaser.GameObjects.Group
+        y: number
     ): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
         const allyScene = character.sprite.scene;
         const roleType = Object.values(RolesMap).find((r) => role instanceof r);
@@ -79,14 +80,61 @@ export default abstract class Role {
 
         this.updateText();
 
-        if (turnElements) {
-            turnElements.addMultiple([
-                this.roleIcon,
-                this.text,
-                this.experienceGraphic,
-                //this.emitter // I cannot add this one or the overlap crashes
-            ]);
-        }
+        return this.roleIcon;
+    }
+
+    public renderIconForAlly(
+        ally: Ally,
+        role: Role,
+        x: number,
+        y: number,
+        turnElements: Phaser.GameObjects.Group
+    ): Phaser.Types.Physics.Arcade.SpriteWithDynamicBody {
+        this.renderIcon(ally, role, x, y);
+
+        const roleType = Object.values(RolesMap).find((r) => role instanceof r);
+
+        let radar = null;
+
+        this.roleIcon.on('pointerdown', (pointer) => {
+            radar = ally.sprite.scene.add.sprite(
+                ally.sprite.getCenter().x,
+                ally.sprite.getCenter().y,
+                '',
+            );
+            radar.scale = 0.3;
+            radar.setTint(roleType.hexColor);
+            radar.anims.play('radar');
+
+            radar.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+                //this.sprite.scene.sound.play('changerole');
+                ally.currentRole.destroy();
+                ally.setRole(roleType);
+                ally.renderRole(ally.sprite.scene);
+                ally.endTurn();
+                radar.destroy();
+
+                const gameServer = new GameServer();
+                gameServer.gameConnection.send({
+                    type: 'enemyStatus',
+                    data: {
+                        from: ally.column,
+                        role: roleType.className,
+                    }
+                });
+            });
+        });
+
+        this.roleIcon.on('pointerup', (pointer) => {
+            radar.destroy();
+        });
+
+        turnElements.addMultiple([
+            this.roleIcon,
+            this.text,
+            this.experienceGraphic,
+            //this.emitter // I cannot add this one or the overlap crashes
+        ]);
 
         return this.roleIcon;
     }

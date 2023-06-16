@@ -4,6 +4,7 @@ import Skill from "../Skill";
 import Attack from "../Skills/Attack";
 
 export default class Novice extends Role {
+    static readonly className = "Novice";
     static readonly icon = 'novice_icon';
     static readonly hexColor = 0xffff00;
     static readonly idleAnimation = 'novice_idle';

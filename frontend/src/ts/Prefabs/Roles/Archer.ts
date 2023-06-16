@@ -10,6 +10,7 @@ import Ragnarok from "../Skills/Ragnarok";
 import SharpShoot from "../Skills/SharpShoot";
 
 export default class Archer extends Role {
+    static readonly className = "Archer";
     static readonly icon = 'archer_icon';
     static readonly hexColor = 0x0fffe7;
     static readonly idleAnimation = 'archer_idle';

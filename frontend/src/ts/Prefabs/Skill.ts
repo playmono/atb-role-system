@@ -145,6 +145,14 @@ export default class Skill {
 
         if (this.ally.currentRole.currentExperience >= this.ally.currentRole.getExperienceToNextLevel()) {
             this.ally.levelUp();
+            const gameServer = new GameServer();
+                gameServer.gameConnection.send({
+                    type: 'enemyStatus',
+                    data: {
+                        from: this.ally.column,
+                        level: this.ally.currentRole.level,
+                    }
+                });
         }
 
         this.ally.endTurn();

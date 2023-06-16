@@ -57,35 +57,7 @@ export default class Ally extends Character {
                 offsetX = 45;
             }
 
-            const icon = otherRoles[i].renderIcon(this, otherRoles[i], x + offsetX, y + offsetY, this.turnElements);
-
-            const roleType = Object.values(RolesMap).find((r) => otherRoles[i] instanceof r);
-
-            let radar = null;
-
-            icon.on('pointerdown', (pointer) => {
-                radar = this.sprite.scene.add.sprite(
-                    this.sprite.getCenter().x,
-                    this.sprite.getCenter().y,
-                    '',
-                );
-                radar.scale = 0.3;
-                radar.setTint(roleType.hexColor);
-                radar.anims.play('radar');
-
-                radar.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-                    //this.sprite.scene.sound.play('changerole');
-                    this.currentRole.destroy();
-                    this.setRole(roleType);
-                    this.renderRole(this.sprite.scene);
-                    this.endTurn();
-                    radar.destroy();
-                });
-            });
-
-            icon.on('pointerup', (pointer) => {
-                radar.destroy();
-            })
+            const icon = otherRoles[i].renderIconForAlly(this, otherRoles[i], x + offsetX, y + offsetY, this.turnElements);
 
             if (i % 2 !== 0) {
                 offsetY += 45;

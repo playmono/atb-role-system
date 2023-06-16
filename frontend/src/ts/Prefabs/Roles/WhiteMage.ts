@@ -10,6 +10,7 @@ import Resurrection from "../Skills/Resurrection";
 import Sanctuary from "../Skills/Sanctuary";
 
 export default class WhiteMage extends Role {
+    static readonly className = "WhiteMage";
     static readonly icon = 'whitemage_icon';
     static readonly hexColor = 0x0afc00;
     static readonly idleAnimation = 'whitemage_idle';

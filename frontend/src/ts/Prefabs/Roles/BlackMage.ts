@@ -10,6 +10,7 @@ import SpiritualMind from "../Skills/SpiritualMind";
 import StoneCurse from "../Skills/StoneCurse";
 
 export default class BlackMage extends Role  {
+    static readonly className = "BlackMage";
     static readonly icon = 'blackmage_icon';
     static readonly hexColor = 0x670fff;
     static readonly idleAnimation = 'blackmage_idle';
