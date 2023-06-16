@@ -15,7 +15,7 @@ export default abstract class Role {
     hexColor: number;
 
     static readonly icon: string;
-    static readonly idleAnimation: string;
+    static readonly baseAnimation: string;
     static readonly spriteScale: number;
     static readonly spriteOffsetY: number;
     static readonly healthMultiplier: number;
@@ -111,7 +111,7 @@ export default abstract class Role {
                 ally.currentRole.destroy();
                 ally.setRole(roleType);
                 ally.renderRole(ally.sprite.scene);
-                ally.endTurn();
+                ally.endTurn(true);
                 radar.destroy();
 
                 const gameServer = new GameServer();

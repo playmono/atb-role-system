@@ -13,7 +13,7 @@ export default class BlackMage extends Role  {
     static readonly className = "BlackMage";
     static readonly icon = 'blackmage_icon';
     static readonly hexColor = 0x670fff;
-    static readonly idleAnimation = 'blackmage_idle';
+    static readonly baseAnimation = 'blackmage';
     static readonly spriteScale = 0.15;
     static readonly spriteOffsetY = 0;
 

@@ -120,6 +120,7 @@ export default class Preloader extends Phaser.Scene {
         this.load.image('ingame_icon', 'vfx/ingame_icon.png');
         this.load.image('accept_button', 'vfx/accept_button.png');
         this.load.image('decline_button', 'vfx/decline_button.png');
+        this.load.image('exit_button', 'vfx/exit_button.png');
         this.load.atlas('radar', 'vfx/radar/spritesheet.png', 'vfx/radar/spritesheet.json');
         this.load.atlas('flares', 'vfx/flares/spritesheet.png', 'vfx/flares/spritesheet.json');
     }
@@ -130,9 +131,13 @@ export default class Preloader extends Phaser.Scene {
 
         this.load.atlas('novice_boy_idle', 'roles/Novice/Boy/Idle/spritesheet.png', 'roles/Novice/Boy/Idle/spritesheet.json');
         this.load.atlas('novice_boy_hurt', 'roles/Novice/Boy/Hurt/spritesheet.png', 'roles/Novice/Boy/Hurt/spritesheet.json');
+        this.load.atlas('novice_boy_attacking', 'roles/Novice/Boy/Attacking/spritesheet.png', 'roles/Novice/Boy/Attacking/spritesheet.json');
+        this.load.atlas('novice_boy_dead', 'roles/Novice/Boy/Dying/spritesheet.png', 'roles/Novice/Boy/Dying/spritesheet.json');
 
         this.load.atlas('novice_girl_idle', 'roles/Novice/Girl/Idle/spritesheet.png', 'roles/Novice/Girl/Idle/spritesheet.json');
         this.load.atlas('novice_girl_hurt', 'roles/Novice/Girl/Hurt/spritesheet.png', 'roles/Novice/Girl/Hurt/spritesheet.json');
+        this.load.atlas('novice_girl_attacking', 'roles/Novice/Girl/Attacking/spritesheet.png', 'roles/Novice/Girl/Attacking/spritesheet.json');
+        this.load.atlas('novice_girl_dead', 'roles/Novice/Girl/Dying/spritesheet.png', 'roles/Novice/Girl/Dying/spritesheet.json');
     }
 
     private loadArcher(): void {
@@ -143,6 +148,9 @@ export default class Preloader extends Phaser.Scene {
         this.load.image('arrow_vulcan', 'skills/arrow_vulcan.png');
 
         this.load.atlas('archer_idle', 'roles/Archer/Idle/spritesheet.png', 'roles/Archer/Idle/spritesheet.json');
+        this.load.atlas('archer_hurt', 'roles/Archer/Hurt/spritesheet.png', 'roles/Archer/Hurt/spritesheet.json');
+        this.load.atlas('archer_attacking', 'roles/Archer/Attacking/spritesheet.png', 'roles/Archer/Attacking/spritesheet.json');
+        this.load.atlas('archer_dead', 'roles/Archer/Dying/spritesheet.png', 'roles/Archer/Dying/spritesheet.json');
     }
 
     private loadBlackMage(): void {
@@ -153,6 +161,9 @@ export default class Preloader extends Phaser.Scene {
         this.load.image('lord_of_vermillion', 'skills/lord_of_vermillion.png');
 
         this.load.atlas('blackmage_idle', 'roles/BlackMage/Idle/spritesheet.png', 'roles/BlackMage/Idle/spritesheet.json');
+        this.load.atlas('blackmage_hurt', 'roles/BlackMage/Hurt/spritesheet.png', 'roles/BlackMage/Hurt/spritesheet.json');
+        this.load.atlas('blackmage_attacking', 'roles/BlackMage/Attacking/spritesheet.png', 'roles/BlackMage/Attacking/spritesheet.json');
+        this.load.atlas('blackmage_dead', 'roles/BlackMage/Dying/spritesheet.png', 'roles/BlackMage/Dying/spritesheet.json');
     }
 
     private loadSwordman(): void {
@@ -163,6 +174,9 @@ export default class Preloader extends Phaser.Scene {
         this.load.image('berserk', 'skills/berserk.png');
 
         this.load.atlas('swordman_idle', 'roles/Swordman/Idle/spritesheet.png', 'roles/Swordman/Idle/spritesheet.json');
+        this.load.atlas('swordman_hurt', 'roles/Swordman/Hurt/spritesheet.png', 'roles/Swordman/Hurt/spritesheet.json');
+        this.load.atlas('swordman_attacking', 'roles/Swordman/Attacking/spritesheet.png', 'roles/Swordman/Attacking/spritesheet.json');
+        this.load.atlas('swordman_dead', 'roles/Swordman/Dying/spritesheet.png', 'roles/Swordman/Dying/spritesheet.json');
     }
 
     private loadWhiteMage(): void {
@@ -173,5 +187,8 @@ export default class Preloader extends Phaser.Scene {
         this.load.image('resurrection', 'skills/resurrection.png');
 
         this.load.atlas('whitemage_idle', 'roles/WhiteMage/Idle/spritesheet.png', 'roles/WhiteMage/Idle/spritesheet.json');
+        this.load.atlas('whitemage_hurt', 'roles/WhiteMage/Hurt/spritesheet.png', 'roles/WhiteMage/Hurt/spritesheet.json');
+        this.load.atlas('whitemage_attacking', 'roles/WhiteMage/Attacking/spritesheet.png', 'roles/WhiteMage/Attacking/spritesheet.json');
+        this.load.atlas('whitemage_dead', 'roles/WhiteMage/Dying/spritesheet.png', 'roles/WhiteMage/Dying/spritesheet.json');
     }
 }

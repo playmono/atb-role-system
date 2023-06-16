@@ -1,6 +1,8 @@
 import Ally from "./Characters/Ally";
 
 export default class Experience {
+    private experienceStop: boolean = false;
+
     static field: Phaser.Geom.Rectangle;
     static icon: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
@@ -18,6 +20,10 @@ export default class Experience {
     }
 
     public activate() {
+        if (this.experienceStop) {
+            return;
+        }
+
         const rndPoint = Experience.field.getRandomPoint();
 
         Experience.icon.enableBody(true, rndPoint.x,rndPoint.y, true, true);
@@ -43,5 +49,9 @@ export default class Experience {
 
         const rnd = Phaser.Math.Between(3000, 5000);
         Experience.icon.scene.time.delayedCall(rnd, this.activate, [], this);
+    }
+
+    public stop() {
+        this.experienceStop = true;
     }
 }

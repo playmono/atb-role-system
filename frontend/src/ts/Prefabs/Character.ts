@@ -5,6 +5,8 @@ import AtbBar from "./Bars/AtbBar";
 import Role from "./Role";
 import Novice from "./Roles/Novice";
 import Archer from "./Roles/Archer";
+import Ally from "./Characters/Ally";
+import Battlefield from "../Scenes/Battlefied";
 
 export default abstract class Character {
     level: number = 1;
@@ -88,9 +90,7 @@ export default abstract class Character {
     }
 
     renderRole(scene: Phaser.Scene) {
-        const idleAnimation = this.currentRoleType === Novice ?
-            this.gender > 0.5 ? 'novice_boy_idle' : 'novice_girl_idle'
-            : this.currentRoleType.idleAnimation;
+        const idleAnimation = `${this.getBaseAnimation()}_idle`;
 
         this.sprite.anims.play(idleAnimation);
         this.sprite.scale = this.currentRoleType.spriteScale;
@@ -119,6 +119,14 @@ export default abstract class Character {
         );
     }
 
+    public getBaseAnimation(): string {
+        const genderString = this.currentRoleType === Novice ?
+            this.gender > 0.5 ? '_boy' : '_girl'
+            : '';
+
+        return `${this.currentRoleType.baseAnimation}${genderString}`;
+    }
+
     public levelUp(): void {
         this.level++;
         this.currentRole.levelUp();
@@ -129,33 +137,42 @@ export default abstract class Character {
     }
 
     public receiveSkill(damage: number): void {
-        const anim = this.sprite.play(this.gender > 0.5 ? 'novice_boy_hurt' : 'novice_girl_hurt');
-
-        this.sprite.on(
+        const anim = this.sprite.play(`${this.getBaseAnimation()}_hurt`);
+        anim.on(
             Phaser.Animations.Events.ANIMATION_COMPLETE,
-            () => this.sprite.play(this.gender > 0.5 ? 'novice_boy_idle' : 'novice_girl_idle'),
+            () => this.sprite.play(`${this.getBaseAnimation()}_idle`),
             this
         );
 
         let result = this.healthCurrent + damage;
 
-        if (result <= 0) {
+        result = Math.min(result, this.healthMax);
+        result = Math.max(result, 0);
+
+        this.healthCurrent = result;
+
+        if (this.healthCurrent <= 0) {
             this.die();
         }
 
-        if (result > this.healthMax) {
-            result = this.healthMax
-        }
-
-        this.healthCurrent = result;
         this.healthBar.update();
     }
 
     protected die(): void {
-        this.currentRole.destroy();
-        this.sprite.destroy();
+        //this.currentRole.destroy();
+        //this.sprite.destroy();
         this.atbBar.bar.destroy();
         this.atbBar.progressBox.destroy();
-        this.healthBar.bar.destroy();
+        //this.healthBar.bar.destroy();
+        this.sprite.play(`${this.getBaseAnimation()}_dead`);
+        const lastFrame = this.sprite.anims.currentAnim.getLastFrame();
+        this.sprite.anims.stopOnFrame(lastFrame);
+
+        if (this instanceof Ally) {
+            this.endTurn(false);
+        }
+
+        const scene = this.sprite.scene as any;
+        scene.checkGameOver();
     }
 }

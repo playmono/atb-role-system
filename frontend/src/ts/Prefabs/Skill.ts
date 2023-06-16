@@ -130,6 +130,13 @@ export default class Skill {
 
         */
 
+        const anim = this.ally.sprite.play(`${this.ally.getBaseAnimation()}_attacking`);
+        anim.on(
+            Phaser.Animations.Events.ANIMATION_COMPLETE,
+            () => this.ally.sprite.play(`${this.ally.getBaseAnimation()}_idle`),
+            this
+        );
+
         appliedOn.receiveSkill(skillType.damage);
 
         const gameServer = new GameServer();
@@ -141,7 +148,7 @@ export default class Skill {
                 characterType: appliedOn instanceof Ally ? 'ally' : 'enemy',
                 skillType: skillType.className
             }
-        })
+        });
 
         if (this.ally.currentRole.currentExperience >= this.ally.currentRole.getExperienceToNextLevel()) {
             this.ally.levelUp();
@@ -155,7 +162,7 @@ export default class Skill {
                 });
         }
 
-        this.ally.endTurn();
+        this.ally.endTurn(true);
     }
 
     private onOverlapWithExperience(skill: any, experienceIcon: any)  {

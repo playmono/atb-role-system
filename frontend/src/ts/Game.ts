@@ -13,7 +13,7 @@ import Lobby from './Scenes/Lobby';
 const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 360,
     height: 640,
-    type: Phaser.WEBGL,
+    type: Phaser.AUTO,
     parent: "content",
     title: "Four Jobs Arena",
     physics: {

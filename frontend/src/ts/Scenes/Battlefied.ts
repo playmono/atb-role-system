@@ -8,12 +8,14 @@ import Trail from "../Prefabs/Trail";
 import Skill from "../Prefabs/Skill";
 import Attack from "../Prefabs/Skills/Attack";
 import { RolesMap, SkillsMap } from "../Prefabs/Constants";
+import Lobby from "./Lobby";
 
 export default class Battlefield extends Phaser.Scene {
     static Name = "Battlefield";
     static allyGroup: Phaser.GameObjects.Group;
     static enemyGroup: Phaser.GameObjects.Group;
     static turnElements: Phaser.GameObjects.Group;
+    static experience: Experience;
     public battlefieldIsReady = false;
     public trail: Trail;
     public enemyTrail: Trail;
@@ -71,8 +73,8 @@ export default class Battlefield extends Phaser.Scene {
         );
         //this.add.graphics({ lineStyle: { color: 0x00ff00 } }).strokeRectShape(experienceField);
 
-        const experience = new Experience(experienceField);
-        experience.render(this);
+        Battlefield.experience = new Experience(experienceField);
+        Battlefield.experience.render(this);
 
         this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
             gameObject.x = dragX;
@@ -129,6 +131,64 @@ export default class Battlefield extends Phaser.Scene {
         });
     }
 
+    public checkGameOver(): void {
+        const foundAlly = Battlefield.allyGroup.children.getArray().find((c: any) => c.__parentClass.healthCurrent > 0);
+        const foundEnemy = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.healthCurrent > 0);
+
+        if (!foundAlly || !foundEnemy) {
+            Battlefield.turnElements.clear(true, true);
+            Battlefield.enemyGroup.children.getArray().forEach((gameObject: any) => {
+                gameObject.__parentClass.atbBar.stop();
+            });
+            Battlefield.allyGroup.children.getArray().forEach((gameObject: any) => {
+                gameObject.__parentClass.atbBar.stop();
+                gameObject.__parentClass.turnElements.clear(true, true);
+            });
+            Battlefield.experience.deactivate();
+            Battlefield.experience.stop();
+
+            const gameOverText = !foundAlly ?
+                'Defeat' :
+                'Victory'
+
+            const text = this.add.text(
+                this.cameras.main.width + 100,
+                this.cameras.main.centerY - 75,
+                gameOverText,
+                {fontSize: "32px", color: 'white'}
+            );
+            text.setOrigin(0.5);
+
+            this.tweens.add({
+                targets: text,
+                x: this.cameras.main.centerX
+            });
+
+            const exitButton = this.add.image(-100, this.cameras.main.centerY, 'exit_button');
+            exitButton.setInteractive();
+            exitButton.scale = 0.25;
+            exitButton.setOrigin(0.5);
+
+            exitButton.on("pointerdown", () => {
+                this.scene.start(Lobby.Name);
+            }, this);
+
+            this.tweens.add({
+                targets: exitButton,
+                x: this.cameras.main.centerX,
+                onComplete: () => {
+                    const pointsText = this.add.text(
+                        this.cameras.main.centerX,
+                        this.cameras.main.centerY - 40,
+                        !foundAlly ? '-50p' : '+50p',
+                        {fontSize: "14px", color: !foundAlly ? 'red' : 'green'}
+                    );
+                    pointsText.setOrigin(0.5);
+                }
+            });
+        }
+    }
+
     public configureListeners(): void {
         const gameServer = new GameServer();
 
@@ -168,29 +228,69 @@ export default class Battlefield extends Phaser.Scene {
         const from = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.from) as any;
 
         if (to) {
+            const anim = from.play(`${from.__parentClass.getBaseAnimation()}_attacking`);
+            anim.on(
+                Phaser.Animations.Events.ANIMATION_COMPLETE,
+                () => from.play(`${from.__parentClass.getBaseAnimation()}_idle`),
+                this
+            );
+
             const skillType = SkillsMap[data.skillType];
             const skill = new skillType();
             const sprite = skill.renderIcon(this, from.x, from.y, skillType);
             sprite.setAlpha(0.7);
             const mask = sprite.mask as any;
 
-            this.tweens.add({
+            const initialScale = skill.sprite.scale;
+
+            this.tweens.chain({
                 targets: skill.sprite,
-                x: to.x,
-                y: to.y,
-                duration: 500,
-                ease: 'Cubic.in',
-                onUpdate: () => {
-                    mask.geometryMask.clear();
-                    mask.geometryMask.fillCircle(sprite.x, sprite.y, Skill.initialValues.radius);
-                    this.enemyTrail.createPoints(sprite.x, sprite.y);
-                },
-                onComplete: () => {
-                    to.__parentClass.receiveSkill(skillType.damage);
-                    sprite.destroy();
-                    mask.destroy();
-                }
-              });
+                tweens: [
+                    {
+                        x: this.cameras.main.centerX,
+                        y: this.cameras.main.centerY - 50,
+                        duration: 100,
+                        ease: 'Cubic.out',
+                        onUpdate: () => {
+                            mask.geometryMask.clear();
+                            mask.geometryMask.fillCircle(sprite.x, sprite.y, Skill.initialValues.radius);
+                            this.enemyTrail.createPoints(sprite.x, sprite.y);
+                        }
+                    },
+                    {
+                        scaleX: 0.25,
+                        scaleY: 0.25,
+                        duration: 200,
+                        onUpdate: () => {
+                            mask.geometryMask.fillCircle(sprite.x, sprite.y, Skill.dragValues.radius);
+                        }
+                    },
+                    {
+                        scaleX: initialScale,
+                        scaleY: initialScale,
+                        duration: 200,
+                        onUpdate: () => {
+                            mask.geometryMask.fillCircle(sprite.x, sprite.y, Skill.initialValues.radius);
+                        }
+                    },
+                    {
+                        x: to.x,
+                        y: to.y,
+                        duration: 100,
+                        ease: 'Cubic.in',
+                        onUpdate: () => {
+                            mask.geometryMask.clear();
+                            mask.geometryMask.fillCircle(sprite.x, sprite.y, Skill.initialValues.radius);
+                            this.enemyTrail.createPoints(sprite.x, sprite.y);
+                        },
+                        onComplete: () => {
+                            to.__parentClass.receiveSkill(skillType.damage);
+                            sprite.destroy();
+                            mask.destroy();
+                        }
+                    }
+                ]
+            });
         }
     }
 
@@ -238,7 +338,7 @@ export default class Battlefield extends Phaser.Scene {
                 start: 0,
                 end: 17,
                 zeroPad: 3,
-                prefix: 'Idle_',
+                prefix: 'Idle Blinking_',
                 suffix: '.png'
             }),
             frameRate: 24,
@@ -258,12 +358,36 @@ export default class Battlefield extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'novice_boy_attacking',
+            frames: this.anims.generateFrameNames('novice_boy_attacking', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Slashing_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'novice_boy_dead',
+            frames: this.anims.generateFrameNames('novice_boy_dead', {
+                start: 0,
+                end: 14,
+                zeroPad: 3,
+                prefix: 'Dying_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
             key: 'novice_girl_idle',
             frames: this.anims.generateFrameNames('novice_girl_idle', {
                 start: 0,
                 end: 17,
                 zeroPad: 3,
-                prefix: 'Idle_',
+                prefix: 'Idle Blinking_',
                 suffix: '.png'
             }),
             frameRate: 24,
@@ -277,6 +401,30 @@ export default class Battlefield extends Phaser.Scene {
                 end: 11,
                 zeroPad: 3,
                 prefix: 'Hurt_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'novice_girl_attacking',
+            frames: this.anims.generateFrameNames('novice_girl_attacking', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Slashing_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'novice_girl_dead',
+            frames: this.anims.generateFrameNames('novice_girl_dead', {
+                start: 0,
+                end: 14,
+                zeroPad: 3,
+                prefix: 'Dying_',
                 suffix: '.png'
             }),
             frameRate: 24,
@@ -296,6 +444,42 @@ export default class Battlefield extends Phaser.Scene {
             frameRate: 24,
             repeat: -1
         });
+
+        this.anims.create({
+            key: 'archer_hurt',
+            frames: this.anims.generateFrameNames('archer_hurt', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Hurt_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'archer_attacking',
+            frames: this.anims.generateFrameNames('archer_attacking', {
+                start: 0,
+                end: 9,
+                zeroPad: 3,
+                prefix: 'Shooting_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'archer_dead',
+            frames: this.anims.generateFrameNames('archer_dead', {
+                start: 0,
+                end: 14,
+                zeroPad: 3,
+                prefix: 'Dying_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
     }
 
     private loadBlackMageAnimations(): void {
@@ -305,11 +489,47 @@ export default class Battlefield extends Phaser.Scene {
                 start: 0,
                 end: 17,
                 zeroPad: 3,
-                prefix: 'Idle_',
+                prefix: 'Idle Blinking_',
                 suffix: '.png'
             }),
             frameRate: 24,
             repeat: -1
+        });
+
+        this.anims.create({
+            key: 'blackmage_hurt',
+            frames: this.anims.generateFrameNames('blackmage_hurt', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Hurt_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'blackmage_attacking',
+            frames: this.anims.generateFrameNames('blackmage_attacking', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Swinging Rod_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'blackmage_dead',
+            frames: this.anims.generateFrameNames('blackmage_dead', {
+                start: 0,
+                end: 14,
+                zeroPad: 3,
+                prefix: 'Dying_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
         });
     }
 
@@ -326,6 +546,42 @@ export default class Battlefield extends Phaser.Scene {
             frameRate: 24,
             repeat: -1
         });
+
+        this.anims.create({
+            key: 'swordman_hurt',
+            frames: this.anims.generateFrameNames('swordman_hurt', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Hurt_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'swordman_attacking',
+            frames: this.anims.generateFrameNames('swordman_attacking', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Slashing_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'swordman_dead',
+            frames: this.anims.generateFrameNames('swordman_dead', {
+                start: 0,
+                end: 14,
+                zeroPad: 3,
+                prefix: 'Dying_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
     }
 
     private loadWhiteMageAnimations(): void {
@@ -340,6 +596,42 @@ export default class Battlefield extends Phaser.Scene {
             }),
             frameRate: 24,
             repeat: -1
+        });
+
+        this.anims.create({
+            key: 'whitemage_hurt',
+            frames: this.anims.generateFrameNames('whitemage_hurt', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Hurt_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'whitemage_attacking',
+            frames: this.anims.generateFrameNames('whitemage_attacking', {
+                start: 0,
+                end: 17,
+                zeroPad: 3,
+                prefix: 'Healing_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
+        });
+
+        this.anims.create({
+            key: 'whitemage_dead',
+            frames: this.anims.generateFrameNames('whitemage_dead', {
+                start: 0,
+                end: 14,
+                zeroPad: 3,
+                prefix: 'Dying_',
+                suffix: '.png'
+            }),
+            frameRate: 24,
         });
     }
 }

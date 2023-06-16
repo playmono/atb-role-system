@@ -5,6 +5,7 @@ export default class AtbBar extends CharacterBar {
     progressBox;
     currentWidth = 0;
     offsetY = 10;
+    atbStop: boolean = false;
 
     render() {
         this.currentWidth = 0;
@@ -28,6 +29,10 @@ export default class AtbBar extends CharacterBar {
     }
 
     updateProgressBar() {
+        if (this.atbStop) {
+            return;
+        }
+
         if (this.currentWidth >= CharacterBar.width) {
             this.bar.emit('barReady');
             this.progressBox.destroy();
@@ -38,5 +43,9 @@ export default class AtbBar extends CharacterBar {
         this.currentWidth++;
 
         this.character.sprite.scene.time.delayedCall(1, this.updateProgressBar, [], this);
+    }
+
+    stop() {
+        this.atbStop = true;
     }
 } 

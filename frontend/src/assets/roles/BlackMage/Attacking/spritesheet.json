@@ -1,0 +1,255 @@
+{
+	"frames": {
+		"Swinging Rod_000.png": {
+			"frame": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_001.png": {
+			"frame": {
+				"x": 900,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_002.png": {
+			"frame": {
+				"x": 1800,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_003.png": {
+			"frame": {
+				"x": 0,
+				"y": 900,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_004.png": {
+			"frame": {
+				"x": 900,
+				"y": 900,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_005.png": {
+			"frame": {
+				"x": 1800,
+				"y": 900,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_006.png": {
+			"frame": {
+				"x": 0,
+				"y": 1800,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_007.png": {
+			"frame": {
+				"x": 900,
+				"y": 1800,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_008.png": {
+			"frame": {
+				"x": 1800,
+				"y": 1800,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_009.png": {
+			"frame": {
+				"x": 2700,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_010.png": {
+			"frame": {
+				"x": 2700,
+				"y": 900,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		},
+		"Swinging Rod_011.png": {
+			"frame": {
+				"x": 2700,
+				"y": 1800,
+				"w": 900,
+				"h": 900
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 900,
+				"h": 900
+			},
+			"sourceSize": {
+				"w": 900,
+				"h": 900
+			}
+		}
+	},
+	"meta": {
+		"app": "http://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"image": "spritesheet.png",
+		"format": "RGBA8888",
+		"size": {
+			"w": 3600,
+			"h": 2700
+		},
+		"scale": "1"
+	}
+}

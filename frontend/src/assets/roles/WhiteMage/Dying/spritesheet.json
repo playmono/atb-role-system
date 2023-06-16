@@ -1,0 +1,315 @@
+{
+	"frames": {
+		"Dying_000.png": {
+			"frame": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_001.png": {
+			"frame": {
+				"x": 480,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_002.png": {
+			"frame": {
+				"x": 960,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_003.png": {
+			"frame": {
+				"x": 0,
+				"y": 480,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_004.png": {
+			"frame": {
+				"x": 480,
+				"y": 480,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_005.png": {
+			"frame": {
+				"x": 960,
+				"y": 480,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_006.png": {
+			"frame": {
+				"x": 0,
+				"y": 960,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_007.png": {
+			"frame": {
+				"x": 480,
+				"y": 960,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_008.png": {
+			"frame": {
+				"x": 960,
+				"y": 960,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_009.png": {
+			"frame": {
+				"x": 1440,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_010.png": {
+			"frame": {
+				"x": 1440,
+				"y": 480,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_011.png": {
+			"frame": {
+				"x": 1440,
+				"y": 960,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_012.png": {
+			"frame": {
+				"x": 0,
+				"y": 1440,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_013.png": {
+			"frame": {
+				"x": 480,
+				"y": 1440,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		},
+		"Dying_014.png": {
+			"frame": {
+				"x": 960,
+				"y": 1440,
+				"w": 480,
+				"h": 480
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 480,
+				"h": 480
+			},
+			"sourceSize": {
+				"w": 480,
+				"h": 480
+			}
+		}
+	},
+	"meta": {
+		"app": "http://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"image": "spritesheet.png",
+		"format": "RGBA8888",
+		"size": {
+			"w": 1920,
+			"h": 1920
+		},
+		"scale": "1"
+	}
+}
