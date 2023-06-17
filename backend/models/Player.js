@@ -13,7 +13,7 @@ export default class Player {
         this.username = object.username;
         this.password = object.password;
         this.rating = object.rating;
-        this.created_at = this.created_at ?? new Date().toISOString();
+        this.createdAt = object.createdAt ?? new Date().toISOString();
         this.status = 'pending';
     }
 

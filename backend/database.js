@@ -3,8 +3,7 @@ import sqlite3 from "sqlite3";
 import { DB_NAME } from "./constants.js";
 import Player from "./models/Player.js";
 import Game from "./models/Game.js";
-
-const db = new sqlite3.Database(DB_NAME);
+import GamePlayer from "./models/GamePlayer.js";
 
 const database = {
     save: function(object) {
@@ -19,15 +18,26 @@ const database = {
     savePlayer: function(player) {
         return new Promise((resolve, reject) => {
             const db = new sqlite3.Database(DB_NAME);
-            db.run('INSERT INTO player VALUES (?, ?, ?, ?, ?)', [
-                player.id,
-                player.username,
-                player.password,
-                player.rating,
-                player.created_at
-            ], (error) => {
-                error? reject(error) : resolve(player);
-            });
+            if (player.password) {
+                db.run('REPLACE INTO player VALUES (?, ?, ?, ?, ?)', [
+                    player.id,
+                    player.username,
+                    player.password,
+                    player.rating,
+                    player.createdAt
+                ], (error) => {
+                    error? reject(error) : resolve(player);
+                });
+            } else {
+                db.run('REPLACE INTO player VALUES (?, ?, ?, ?)', [
+                    player.id,
+                    player.username,
+                    player.rating,
+                    player.createdAt
+                ], (error) => {
+                    error? reject(error) : resolve(player);
+                });
+            }
             db.close();
         });
     },
@@ -36,10 +46,10 @@ const database = {
         const promises =  [];
         let promiseQuery = new Promise ((resolve, reject) => {
             const db = new sqlite3.Database(DB_NAME);
-            db.run('INSERT INTO game VALUES (?, ?, ?)', [
+            db.run('REPLACE INTO game VALUES (?, ?, ?)', [
                 game.id,
-                game.started_at,
-                game.finished_at
+                game.startedAt,
+                game.finishedAt
             ], (error) => {
                 error? reject(error) : resolve(game);
             });
@@ -49,7 +59,7 @@ const database = {
         game.gamePlayers.forEach((gamePlayer) => {
             promiseQuery = new Promise((resolve, reject) => {
                 const db = new sqlite3.Database(DB_NAME);
-                db.run('INSERT INTO game_player VALUES (?, ?, ?, ?)', [
+                db.run('REPLACE INTO game_player VALUES (?, ?, ?, ?)', [
                     gamePlayer.game.id,
                     gamePlayer.player.id,
                     gamePlayer.peerId,
@@ -60,6 +70,7 @@ const database = {
                 db.close();
             });
             promises.push(promiseQuery);
+            promises.push(this.savePlayer(gamePlayer.player));
         });
 
         return Promise.all(promises);
@@ -72,14 +83,7 @@ const database = {
                 if (error) {
                     reject(error);
                 } else {
-                    const result = !row ? null : new Player({
-                        id: row.id, 
-                        username: row.username,
-                        password: row.password,
-                        rating: row.rating,
-                        created_at: row.creating_at
-                    });
-                    resolve(result);
+                    resolve(this.mapRowToPlayer(row));
                 }
             });
             db.close();
@@ -93,17 +97,79 @@ const database = {
                 if (error) {
                     reject(error);
                 } else {
-                    const result = !row ? null : new Player({
-                        id: row.id,
-                        username: row.username,
-                        password: row.password,
-                        rating: row.rating,
-                        created_at: row.creating_at
-                    });
-                    resolve(result);
+                    resolve(this.mapRowToPlayer(row));
                 }
             });
             db.close();
+        });
+    },
+
+    findGameById: function(id) {
+        return new Promise((resolve, reject) => {
+            const db = new sqlite3.Database(DB_NAME);
+            db.all('SELECT * FROM game LEFT JOIN game_player ON game.id = game_player.id_game LEFT JOIN player ON game_player.id_player = player.id WHERE game.id = ?', [id], (error, rows) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(this.mapRowsToGame(rows));
+                }
+            });
+            db.close();
+        });
+    },
+
+    mapRowToPlayer: function(row) {
+        return !row ? null : new Player({
+            id: row.id,
+            username: row.username,
+            password: row.password,
+            rating: row.rating,
+            createdAt: row.creating_at
+        });
+    },
+
+    mapRowsToGame: function(rows) {
+        if (rows.length === 0) {
+            return null;
+        }
+
+        const game = new Game({
+            id: rows[0].id_game,
+            startedAt: rows[0].started_at,
+            finishedAt: rows[0].finished_at
+        });
+
+        game.gamePlayers = rows.map((row) => {
+           const gamePlayer = this.mapRowToGamePlayer(row);
+           gamePlayer.game = game;
+           return gamePlayer;
+        });
+
+        return game;
+    },
+
+    mapRowToGamePlayer: function(row) {
+        if (!row) {
+            return null;
+        }
+
+        const game = Game.createGame({
+            id: row.id_game,
+            startedAt: row.started_at,
+            finishedAt: row.finished_at
+        });
+        const player = new Player({
+            id: row.id_player,
+            username: row.username,
+            password: row.password,
+            rating: row.rating,
+            createdAt: row.creating_at
+        });
+        return GamePlayer.createGamePlayer({
+            game: game,
+            player: player,
+            peerId: row.id_peer,
+            result: row.result
         });
     },
 

@@ -27,7 +27,14 @@ export default class GameServer {
             //debug: 3
         });
 
+        this.configureListeners();
+
+        GameServer.instance = this;
+    }
+
+    public configureListeners(): void {
         this.peer.socket.on('message', (message) => {
+            console.log('message captured in gameServer:configureListeners:message', message);
             if (message.type === 'gameConnect') {
                 this.addToPlayerList(message.data);
             }
@@ -47,11 +54,15 @@ export default class GameServer {
 
         this.peer.on('connection', (conn) => {
             conn.on('open', () => {
+                console.log('message captured in gameServer:configureListeners:open');
                 this.gameConnection = conn;
             });
         });
+    }
 
-        GameServer.instance = this;
+    public unconfigureListeners(): void {
+        this.peer.socket.off('message');
+        this.peer.off('connection');
     }
 
     public async setPlayer(): Promise<void> {
@@ -97,6 +108,9 @@ export default class GameServer {
             const found = this.playerList.findIndex((element) => element.id === player.id);
             if (found !== -1) {
                 this.playerList.splice(found, 1, player);
+            }
+            if (player.id === this.player.id) {
+                this.player = player;
             }
         });
     }
@@ -144,7 +158,8 @@ export default class GameServer {
         if (responseData.data.status === 'accept') {
             this.game = responseData.data.game;
             const conn = this.peer.connect(this.getOppositeGamePlayer().peerId);
-            conn.on('open', () => {
+            conn.once('open', () => {
+                console.log('message captured in gameServer:respondChallenge:open');
                 this.gameConnection = conn;
                 conn.send({type: 'startGame'});
                 callback();
@@ -175,5 +190,31 @@ export default class GameServer {
 
     public closeConnection(): void {
         this.peer.destroy();
+    }
+
+    public async sendGameResult(won: boolean, onSuccess: Function, onError: Function): Promise<void> {
+        const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL + ':' + process.env.APP_PORT;
+        const response = await fetch(`${url}/games/${this.game.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": this.token
+            },
+            body: JSON.stringify({
+                from: this.player.id,
+                winnerId: won ? this.player.id : this.getOppositeGamePlayer().player.id
+            })
+        });
+        if (response.status === 200) {
+            onSuccess();
+        } else {
+            onError();
+        }
+    }
+
+    public endGame(): void {
+        this.game = null;
+        this.gameConnection.close();
+        this.setPlayer();
     }
 }

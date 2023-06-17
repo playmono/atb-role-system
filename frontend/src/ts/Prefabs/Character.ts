@@ -173,6 +173,6 @@ export default abstract class Character {
         }
 
         const scene = this.sprite.scene as any;
-        scene.checkGameOver();
+        scene.checkGameOver(false);
     }
 }

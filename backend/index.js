@@ -106,7 +106,7 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/get-player-by-client-id/:clientId", authenticateToken, (req, res) => {
-    console.log('Received GET /get-player-by-client-id/');
+    console.log(`Received GET /get-player-by-client-id/${req.params.clientId}`);
     const user = users.get(req.params.clientId);
     if (!user) {
         return sendError(res, {code: 404, message: 'Player not found'});
@@ -161,7 +161,7 @@ app.post("/challenges", authenticateToken, (req, res) => {
 });
 
 app.put("/challenge/:challengeId", authenticateToken, (req, res) => {
-    console.log('Received PUT /challenge');
+    console.log(`Received PUT /challenge/${req.params.challengeId}`);
     const challenge = challenges.get(req.params.challengeId);
     if (!challenge) {
         return sendError(res, {code: 404, message: 'Challenge not found'});
@@ -187,6 +187,55 @@ app.get("/active-players", authenticateToken, (req, res) => {
         players.push(user.player);
     })
     res.status(200).send(JSON.stringify(players));
+});
+
+app.put("/games/:gameId", authenticateToken, (req, res) => {
+    console.log(`Received PUT /game/${req.params.gameId}`);
+    let savedGame = null;
+    database.findGameById(req.params.gameId)
+        .then((game) => {
+            if (game.finishedAt) {
+                savedGame = game;
+                return;
+            }
+            const found = game.gamePlayers.find((gamePlayer) => gamePlayer.player.id === req.user.player.id);
+            if (!found) {
+                throw Error('Player has no priviliges on this game!');
+            }
+            game.finishedAt = new Date().toISOString();
+            game.gamePlayers.forEach((gamePlayer) => {
+                if (gamePlayer.player.id === req.body.winnerId) {
+                    gamePlayer.result = 'win';
+                    gamePlayer.player.rating += 50;
+                } else {
+                    gamePlayer.result = 'lose';
+                    gamePlayer.player.rating -= 50;
+                }
+            });
+            savedGame = game;
+            return database.save(game);
+        })
+        .then(() => {
+            const gamePlayer = savedGame.gamePlayers.find((gamePlayer) => gamePlayer.player.id === req.body.from);
+
+            if (gamePlayer) {
+                const playerToUpdate = gamePlayer.player;
+                playerToUpdate.hidePassword();
+                playerToUpdate.status = 'pending';
+
+                sendToAllClients({
+                    type: 'playerUpdate',
+                    data: {
+                        players: [playerToUpdate]
+                    }
+                });
+            }
+
+            return res.sendStatus(200);
+        })
+        .catch ((error) => {
+            return sendError(res, error);
+        });
 });
 
 function sendError(res, error) {

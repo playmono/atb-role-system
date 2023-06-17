@@ -19,6 +19,7 @@ export default class Battlefield extends Phaser.Scene {
     public battlefieldIsReady = false;
     public trail: Trail;
     public enemyTrail: Trail;
+    private gameIsOver = false;
 
     public preload(): void {
         this.loadSfx();
@@ -131,66 +132,97 @@ export default class Battlefield extends Phaser.Scene {
         });
     }
 
-    public checkGameOver(): void {
+    public checkGameOver(forceVictory: boolean): void {
+        if (this.gameIsOver) {
+            return;
+        }
+
         const foundAlly = Battlefield.allyGroup.children.getArray().find((c: any) => c.__parentClass.healthCurrent > 0);
         const foundEnemy = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.healthCurrent > 0);
 
-        if (!foundAlly || !foundEnemy) {
-            Battlefield.turnElements.clear(true, true);
-            Battlefield.enemyGroup.children.getArray().forEach((gameObject: any) => {
-                gameObject.__parentClass.atbBar.stop();
-            });
-            Battlefield.allyGroup.children.getArray().forEach((gameObject: any) => {
-                gameObject.__parentClass.atbBar.stop();
-                gameObject.__parentClass.turnElements.clear(true, true);
-            });
-            Battlefield.experience.deactivate();
-            Battlefield.experience.stop();
-
-            const gameOverText = !foundAlly ?
-                'Defeat' :
-                'Victory'
-
-            const text = this.add.text(
-                this.cameras.main.width + 100,
-                this.cameras.main.centerY - 75,
-                gameOverText,
-                {fontSize: "32px", color: 'white'}
-            );
-            text.setOrigin(0.5);
-
-            this.tweens.add({
-                targets: text,
-                x: this.cameras.main.centerX
-            });
-
-            const exitButton = this.add.image(-100, this.cameras.main.centerY, 'exit_button');
-            exitButton.setInteractive();
-            exitButton.scale = 0.25;
-            exitButton.setOrigin(0.5);
-
-            exitButton.on("pointerdown", () => {
-                this.scene.start(Lobby.Name);
-            }, this);
-
-            this.tweens.add({
-                targets: exitButton,
-                x: this.cameras.main.centerX,
-                onComplete: () => {
-                    const pointsText = this.add.text(
-                        this.cameras.main.centerX,
-                        this.cameras.main.centerY - 40,
-                        !foundAlly ? '-50p' : '+50p',
-                        {fontSize: "14px", color: !foundAlly ? 'red' : 'green'}
-                    );
-                    pointsText.setOrigin(0.5);
-                }
-            });
+        if (foundAlly && foundEnemy && !forceVictory) {
+            return;
         }
+
+        this.gameIsOver = true;
+
+        const gameServer = new GameServer();
+        gameServer.configureListeners();
+
+        Battlefield.turnElements.clear(true, true);
+        Battlefield.enemyGroup.children.getArray().forEach((gameObject: any) => {
+            gameObject.__parentClass.atbBar.stop();
+        });
+        Battlefield.allyGroup.children.getArray().forEach((gameObject: any) => {
+            gameObject.__parentClass.atbBar.stop();
+            gameObject.__parentClass.turnElements.clear(true, true);
+        });
+        Battlefield.experience.deactivate();
+        Battlefield.experience.stop();
+
+        const gameWon = !foundEnemy || forceVictory;
+
+        const gameOverText = gameWon ?
+            'Victory' :
+            'Defeat'
+
+        const text = this.add.text(
+            this.cameras.main.width + 100,
+            this.cameras.main.centerY - 75,
+            gameOverText,
+            {fontSize: "32px", color: 'white'}
+        );
+        text.setOrigin(0.5);
+
+        this.tweens.add({
+            targets: text,
+            x: this.cameras.main.centerX
+        });
+
+        const exitButton = this.add.image(-100, this.cameras.main.centerY, 'exit_button');
+        exitButton.setInteractive();
+        exitButton.scale = 0.25;
+        exitButton.setOrigin(0.5);
+
+        exitButton.on("pointerdown", async() => {
+            await gameServer.sendGameResult(
+                gameWon,
+                () => {
+                    this.endBattlefield();
+                },
+                () => {
+                    const text = this.add.text(
+                        this.cameras.main.centerX,
+                        this.cameras.main.centerY + 30,
+                        'Error. Try again',
+                        {fontSize: "16px", color: 'white'}
+                    );
+                    text.setOrigin(0.5);
+                }
+            );
+        }, this);
+
+        this.tweens.add({
+            targets: exitButton,
+            x: this.cameras.main.centerX,
+            onComplete: () => {
+                const pointsText = this.add.text(
+                    this.cameras.main.centerX,
+                    this.cameras.main.centerY - 40,
+                    !gameWon ? '-50p' : '+50p',
+                    {fontSize: "14px", color: !gameWon ? 'red' : 'green'}
+                );
+                pointsText.setOrigin(0.5);
+            }
+        });
     }
 
     public configureListeners(): void {
         const gameServer = new GameServer();
+
+        gameServer.gameConnection.on('close', () => {
+            this.checkGameOver(true);
+        });
 
         gameServer.gameConnection.on('data', (data: any) => {
             console.log('Received on battlefield', data);
@@ -310,6 +342,14 @@ export default class Battlefield extends Phaser.Scene {
             }
             from.__parentClass.renderRole(this);
         }
+    }
+
+    private endBattlefield(): void {
+        const gameServer = new GameServer();
+        //gameServer.gameConnection.off('close');
+        //gameServer.gameConnection.off('data');
+        gameServer.endGame();
+        this.scene.start(Lobby.Name)
     }
 
     private loadSfx(): void {

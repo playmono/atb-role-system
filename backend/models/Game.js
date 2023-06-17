@@ -3,8 +3,8 @@ import GamePlayer from "./GamePlayer.js";
 export default class Game {
     constructor(object) {
         this.id = object.id;
-        this.started_at = this.started_at ?? new Date().toISOString();
-        this.finished_at = null;
+        this.startedAt = object.startedAt ?? new Date().toISOString();
+        this.finishedAt = object.finishedAt;
         this.gamePlayers = [];
     }
 

@@ -45,6 +45,7 @@ export default class Lobby extends Phaser.Scene {
             conn.on('data', (data: any) => {
                 console.log("Received on lobby", data);
                 if (data.type === 'startGame') {
+                    gameServer.peer.socket.off('message');
                     this.scene.start(Battlefield.Name);
                 }
                 if (data.type === "battlefieldLoaded") {
@@ -169,6 +170,7 @@ export default class Lobby extends Phaser.Scene {
 
         acceptButton.on("pointerdown", () => {
             gameServer.respondChallenge('accept', () => {
+                gameServer.unconfigureListeners();
                 this.scene.start(Battlefield.Name);
             });
         }, this);

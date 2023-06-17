@@ -32,9 +32,13 @@ export default class SignUp extends Phaser.Scene {
                         },
                         body: JSON.stringify(data)
                     });
-                    if (response.status !== 201) {
+                    if (response.status !== 200) {
                         const responseData = await response.json();
                         throw new Error(responseData.errorMessage);
+                    } else {
+                        this.getChildByName('usernameField').value = '';
+                        this.getChildByName('passwordField').value = '';
+                        this.getChildByID('error').innerText = 'User created succesfully'
                     }
                 } catch (error) {
                     this.getChildByID('error').innerText = error.message;
