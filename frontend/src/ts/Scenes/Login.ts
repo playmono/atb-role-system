@@ -16,7 +16,18 @@ export default class Login extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("Login", "create");
 
-        const loginText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 4, "Login");
+        const logo = this.add.image(this.cameras.main.centerX, 150, 'logo');
+        logo.scale = 0.25;
+        /*
+        this.tweens.add({
+            targets: logo,
+            duration: 500,
+            scaleX: 3,
+            scaleY: 3,
+        });
+        */
+
+        const loginText = this.add.text(this.cameras.main.centerX, logo.y + 180, "Login");
         loginText
             .setFontFamily("monospace")
             .setFontSize(40)
@@ -24,7 +35,7 @@ export default class Login extends Phaser.Scene {
             .setAlign("center")
             .setOrigin(0.5);
 
-        const element = this.add.dom(this.cameras.main.centerX, this.cameras.main.centerY).createFromCache('login');
+        const element = this.add.dom(this.cameras.main.centerX, loginText.y + 100).createFromCache('login');
         const button = element.getChildByName('button');
         button.setAttribute('value', 'Login');
 
@@ -53,10 +64,22 @@ export default class Login extends Phaser.Scene {
                     gameServer.peer.on('open', async (id) => {
                         await gameServer.setPlayer();
                         await gameServer.setPlayerList();
-                        _that.scene.start(Lobby.Name);
+                        element.destroy();
+                        backText.destroy();
+                        loginText.destroy();
+                        _that.tweens.add({
+                            targets: logo,
+                            duration: 500,
+                            scaleX: 15,
+                            scaleY: 15,
+                            onComplete: () => {
+                                _that.scene.start(Lobby.Name);
+                            }
+                        });
                     });
                 } catch (error) {
-                    this.getChildByID('error').innerText = error.message;
+                    console.log(error.message);
+                    this.getChildByID('error').innerText = 'Login failed. Please, try again in a few minutes';
                 }
             }
         });

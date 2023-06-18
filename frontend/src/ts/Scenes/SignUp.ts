@@ -13,7 +13,10 @@ export default class SignUp extends Phaser.Scene {
     public create(): void {
         Utilities.LogSceneMethodEntry("SignUp", "create");
 
-        const signupText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 4, "Sign Up");
+        const logo = this.add.image(this.cameras.main.centerX, 150, 'logo');
+        logo.scale = 0.25;
+
+        const signupText = this.add.text(this.cameras.main.centerX, logo.y + 180, "Sign Up");
         signupText
             .setFontFamily("monospace")
             .setFontSize(40)
@@ -21,7 +24,8 @@ export default class SignUp extends Phaser.Scene {
             .setAlign("center")
             .setOrigin(0.5);
 
-        const element = this.add.dom(this.cameras.main.centerX, this.cameras.main.centerY).createFromCache('login');
+        const element = this.add.dom(this.cameras.main.centerX, signupText.y + 100).createFromCache('login');
+
         element.addListener('click');
         element.on('click', async function (event) {
             if (event.target.name === 'button') {

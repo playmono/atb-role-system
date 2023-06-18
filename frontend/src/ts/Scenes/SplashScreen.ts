@@ -2,9 +2,6 @@ import Utilities from "../Utilities";
 import MainMenu from "./MainMenu";
 
 export default class SplashScreen extends Phaser.Scene {
-	/**
-	 * Unique name of the scene.
-	 */
 	public static Name = "SplashScreen";
 
 	public preload(): void {
@@ -13,10 +10,6 @@ export default class SplashScreen extends Phaser.Scene {
 
 	public create(): void {
 		Utilities.LogSceneMethodEntry("SplashScreen", "create");
-
-		const titleText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY * 0.5, "Starter Project for Phaser 3 with TypeScript")
-			.setOrigin(0.5, 0)
-			.setFontFamily("monospace").setFontSize(26).setFill("#fff");
 
 		const poweredByText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 25, "Powered By");
 		poweredByText.setOrigin(0.5, 0.5);
@@ -35,9 +28,6 @@ export default class SplashScreen extends Phaser.Scene {
 		});
 	}
 
-	/**
-	 * Load the next scene, the main menu.
-	 */
 	private loadMainMenu(): void {
 		this.scene.start(MainMenu.Name);
 	}
