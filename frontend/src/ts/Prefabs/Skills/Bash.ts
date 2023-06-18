@@ -8,4 +8,5 @@ export default class Bash extends Skill {
     static readonly damageType = DamageType.Physical;
     static readonly areaOfEffect = AreaOfEffect.Single;
     static readonly scale = 1;
+    static readonly soundEffect: string = 'bash';
 }

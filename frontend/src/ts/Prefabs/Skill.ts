@@ -16,7 +16,8 @@ export default class Skill {
     static readonly effectRange: EffectRange;
     static readonly damageType: DamageType;
     static readonly areaOfEffect: AreaOfEffect;
-    static readonly damage: number = -10;
+    static readonly damage: number = -100;
+    static readonly soundEffect: string = 'spell';
 
     static readonly skills: [number, typeof Skill][];
 
@@ -123,12 +124,18 @@ export default class Skill {
         const skill = skillSprite.__parentClass;
         const skillType = skillSprite.__typeOfParentClass;
 
+        if (appliedOn.healthCurrent <= 0) {
+            return;
+        }
+
         // DAMAGE FORMULA
         /*const damage = skillType.damageType === DamageType.Physical ?
             (character.attackPhysical - appliedOn.defensePhysical) * skillType.damage :
             (character.attackMagical - appliedOn.defenseMagical) * skillType.damage;
 
         */
+
+        skillSprite.scene.sound.play(skillType.soundEffect);
 
         const anim = this.ally.sprite.play(`${this.ally.getBaseAnimation()}_attacking`);
         anim.on(
@@ -166,6 +173,7 @@ export default class Skill {
     }
 
     private onOverlapWithExperience(skill: any, experienceIcon: any)  {
+        skill.scene.sound.play('experience');
         experienceIcon['__parentClass'].sendToAlly(skill['__parentClass'].ally);
     }
 

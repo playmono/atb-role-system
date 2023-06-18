@@ -40,7 +40,7 @@ export default class Experience {
             x: ally.currentRole.roleIcon.x,
             y: ally.currentRole.roleIcon.y,
             ease: {x: 'Quart.In', y: 'Back.in'},
-            duration: 300
+            duration: 100
         });
         tween.on('complete', () => {
             ally.addExperience(100);

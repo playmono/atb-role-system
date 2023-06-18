@@ -60,7 +60,7 @@ module.exports = {
 	],
 	performance: {
 		maxEntrypointSize: 512000,
-		maxAssetSize: 3000000,
+		maxAssetSize: 5000000,
 		assetFilter: function(assetFilename) {
 			let customExclusions = ['lib/phaser.min.js'];
 			if (customExclusions.includes(assetFilename)) {

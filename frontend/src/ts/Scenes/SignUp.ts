@@ -26,6 +26,7 @@ export default class SignUp extends Phaser.Scene {
 
         const element = this.add.dom(this.cameras.main.centerX, signupText.y + 100).createFromCache('login');
 
+        const _that = this;
         element.addListener('click');
         element.on('click', async function (event) {
             if (event.target.name === 'button') {
@@ -43,9 +44,11 @@ export default class SignUp extends Phaser.Scene {
                         body: JSON.stringify(data)
                     });
                     if (response.status !== 200) {
+                        _that.sound.play('error');
                         const responseData = await response.json();
                         throw new Error(responseData.errorMessage);
                     } else {
+                        _that.sound.play('confirm');
                         this.getChildByName('usernameField').value = '';
                         this.getChildByName('passwordField').value = '';
                         this.getChildByID('error').innerText = 'User created succesfully'
@@ -62,7 +65,10 @@ export default class SignUp extends Phaser.Scene {
             .setOrigin(0.5)
             .setFontFamily("monospace").setFontSize(25).setFill("#fff")
             .setInteractive();
-        backText.on("pointerdown", () => { this.scene.start(MainMenu.Name); }, this);
+        backText.on("pointerdown", () => {
+            this.sound.play('back');
+            this.scene.start(MainMenu.Name);
+        }, this);
     }
 
     public update(): void {

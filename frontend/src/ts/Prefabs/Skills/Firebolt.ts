@@ -9,4 +9,6 @@ export default class FireBolt extends Skill {
     static readonly areaOfEffect = AreaOfEffect.Single;
     static readonly scale = 0.5;
     static readonly damage = -30;
+    static readonly soundEffect: string = 'fireball';
+    
 }

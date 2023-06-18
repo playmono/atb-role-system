@@ -139,7 +139,7 @@ export default class GameServer {
         });
     }
 
-    public async respondChallenge(status: string, onSuccess?: Function, onFailure?: Function): Promise<void> {
+    public async respondChallenge(status: string, onSuccess: Function, onFailure?: Function): Promise<void> {
         const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL + ':' + process.env.APP_PORT;
         const response = await fetch(`${url}/challenge/${this.challengeId}`, {
             method: "PUT",
@@ -151,7 +151,9 @@ export default class GameServer {
         });
         const responseData = await response.json();
         if (response.status !== 200) {
-            onFailure();
+            if (onFailure) {
+                onFailure();
+            }
         }
         if (responseData.data.status === 'accept') {
             this.game = responseData.data.game;

@@ -8,4 +8,5 @@ export default class FireArrow extends Skill {
     static readonly damageType = DamageType.Magical;
     static readonly areaOfEffect = AreaOfEffect.Single;
     static readonly scale = 0.8;
+    static readonly soundEffect: string = 'arrow';
 }

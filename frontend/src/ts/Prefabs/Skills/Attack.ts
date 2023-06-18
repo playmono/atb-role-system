@@ -8,4 +8,5 @@ export default class Attack extends Skill {
     static readonly damageType = DamageType.Physical;
     static readonly areaOfEffect = AreaOfEffect.Single;
     static readonly scale = 0.10;
+    static readonly soundEffect: string = 'punch';
 }

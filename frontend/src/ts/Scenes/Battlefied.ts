@@ -41,6 +41,9 @@ export default class Battlefield extends Phaser.Scene {
         this.trail = new Trail(this, 0x00FFFF, 1);
         this.enemyTrail = new Trail(this, 0xFF0000, 0.5);
 
+        this.sound.stopAll();
+        this.sound.play('battle');
+
         gameServer.gameConnection.on('close', () => {
             this.checkGameOver(true);
         });
@@ -208,10 +211,18 @@ export default class Battlefield extends Phaser.Scene {
         );
         textError.setOrigin(0.5);
 
+        this.sound.stopAll();
+        if (gameWon) {
+            this.sound.play('victory');
+        } else {
+            this.sound.play('defeat');
+        }
+
         exitButton.on("pointerdown", async() => {
             await gameServer.sendGameResult(
                 gameWon,
                 () => {
+                    this.sound.play('select');
                     textError.destroy();
                     this.endBattlefield();
                 },
@@ -255,6 +266,9 @@ export default class Battlefield extends Phaser.Scene {
         const from = Battlefield.enemyGroup.children.getArray().find((c: any) => c.__parentClass.column === data.from) as any;
 
         if (to) {
+            from.__parentClass.atbBar.bar.destroy();
+            from.__parentClass.atbBar.render();
+
             const anim = from.play(`${from.__parentClass.getBaseAnimation()}_attacking`);
             anim.on(
                 Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -269,6 +283,8 @@ export default class Battlefield extends Phaser.Scene {
             const mask = sprite.mask as any;
 
             const initialScale = skill.sprite.scale;
+
+            this.sound.play(skillType.soundEffect);
 
             this.tweens.chain({
                 targets: skill.sprite,
@@ -327,12 +343,20 @@ export default class Battlefield extends Phaser.Scene {
         if (from) {
             from.__parentClass.currentRole.destroy();
             if (data.level) {
-                from.__parentClass.currentRole.level = data.level;
+                if (from.__parentClass.currentRole.level !== data.level) {
+                    this.sound.play('levelup');
+                    from.__parentClass.currentRole.level = data.level;
+                }
             }
             if (data.role) {
                 const roleType = RolesMap[data.role];
                 if (roleType) {
-                    from.__parentClass.setRole(roleType);
+                    if (from.__parentClass.currentRoleType !== roleType)  {
+                        this.sound.play('changerole');
+                        from.__parentClass.atbBar.bar.destroy();
+                        from.__parentClass.atbBar.render();
+                        from.__parentClass.setRole(roleType);
+                    }
                 }
             }
             from.__parentClass.renderRole(this);

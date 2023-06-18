@@ -13,6 +13,7 @@ export default abstract class Role {
     emitter: Phaser.GameObjects.Particles.ParticleEmitter;
     currentExperience: number = 0;
     hexColor: number;
+    sparkleSound = null;
 
     static readonly icon: string;
     static readonly baseAnimation: string;
@@ -107,7 +108,7 @@ export default abstract class Role {
             radar.anims.play('radar');
 
             radar.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-                //this.sprite.scene.sound.play('changerole');
+                ally.sprite.scene.sound.play('changerole');
                 ally.currentRole.destroy();
                 ally.setRole(roleType);
                 ally.renderRole(ally.sprite.scene);
@@ -182,9 +183,14 @@ export default abstract class Role {
         this.experienceGraphic.fillPath();
 
         if (this.currentExperience >= this.getExperienceToNextLevel()) {
+            this.sparkleSound = this.roleIcon.scene.sound.add('sparkle', {loop: true, volume: 0.3});
+            this.sparkleSound.play();
             this.emitter.start();
         } else {
-            this.emitter.stop();
+            if (this.roleIcon && this.roleIcon.scene && this.sparkleSound) {
+                this.sparkleSound.stop();
+                this.emitter.stop();
+            }
         }
     }
 

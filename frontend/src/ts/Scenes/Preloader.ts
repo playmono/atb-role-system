@@ -111,9 +111,32 @@ export default class Preloader extends Phaser.Scene {
 
     private loadSfx(): void {
         this.load.audio('changerole', 'sfx/changejob.mp3');
+        this.load.audio('music_intro', 'sfx/music-intro.mp3');
+        this.load.audio('teleport', 'sfx/teleport.mp3');
+        this.load.audio('lobby', 'sfx/lobby.mp3');
+        this.load.audio('back', 'sfx/back.mp3');
+        this.load.audio('select', 'sfx/select.mp3');
+        this.load.audio('confirm', 'sfx/confirm.mp3');
+        this.load.audio('error', 'sfx/error.mp3');
+        this.load.audio('battle', 'sfx/battle.mp3');
+        this.load.audio('defeat', 'sfx/defeat.mp3');
+        this.load.audio('victory', 'sfx/victory.mp3');
+        this.load.audio('spell', 'sfx/spell.mp3');
+        this.load.audio('experience', 'sfx/experience.mp3');
+        this.load.audio('hurt_girl', 'sfx/hurt-girl.mp3');
+        this.load.audio('hurt_boy', 'sfx/hurt-boy.mp3');
+        this.load.audio('levelup', 'sfx/levelup.mp3');
+        this.load.audio('sparkle', 'sfx/sparkle.wav');
+        this.load.audio('heal', 'sfx/heal.mp3');
+        this.load.audio('punch', 'sfx/punch.wav');
+        this.load.audio('fireball', 'sfx/fireball.mp3');
+        this.load.audio('arrow', 'sfx/arrow.wav');
+        this.load.audio('bash', 'sfx/bash.wav');
     }
 
     private loadVfx(): void {
+        this.load.image('play_button_enabled', 'vfx/play_button_enabled.png');
+        this.load.image('play_button_disabled', 'vfx/play_button_disabled.png');
         this.load.image('experience_icon', 'vfx/experience.png');
         this.load.image('challenged_icon', 'vfx/challenged_icon.png');
         this.load.image('pending_icon', 'vfx/pending_icon.png');

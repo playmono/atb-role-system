@@ -128,6 +128,7 @@ export default abstract class Character {
     }
 
     public levelUp(): void {
+        this.sprite.scene.sound.play('levelup');
         this.level++;
         this.currentRole.levelUp();
     }
@@ -137,12 +138,20 @@ export default abstract class Character {
     }
 
     public receiveSkill(damage: number): void {
-        const anim = this.sprite.play(`${this.getBaseAnimation()}_hurt`);
-        anim.on(
-            Phaser.Animations.Events.ANIMATION_COMPLETE,
-            () => this.sprite.play(`${this.getBaseAnimation()}_idle`),
-            this
-        );
+        if (damage < 0) {
+            if (this.gender > 0.5) {
+                this.sprite.scene.sound.play('hurt_boy');
+            } else {
+                this.sprite.scene.sound.play('hurt_girl');
+            }
+
+            const anim = this.sprite.play(`${this.getBaseAnimation()}_hurt`);
+            anim.on(
+                Phaser.Animations.Events.ANIMATION_COMPLETE,
+                () => this.sprite.play(`${this.getBaseAnimation()}_idle`),
+                this
+            );
+        }
 
         let result = this.healthCurrent + damage;
 

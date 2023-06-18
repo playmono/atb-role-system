@@ -20,6 +20,13 @@ export default class Lobby extends Phaser.Scene {
         Lobby.playerNamesList = this.physics.add.group();
         Lobby.challengeGameObjects = this.physics.add.group();
 
+        this.sound.stopByKey('music_intro');
+        this.sound.stopByKey('battle');
+
+        if (!this.sound.get('lobby') || !this.sound.get('lobby').isPlaying) {
+            this.sound.play('lobby', {loop: true, volume: 0.8});
+        }
+
         this.renderPlayerList();
 
         if (!this.listenersSetup) {
@@ -38,6 +45,7 @@ export default class Lobby extends Phaser.Scene {
         backText.on("pointerdown", () => {
             const gameServer = new GameServer();
             gameServer.closeConnection();
+            this.sound.play('back');
             this.scene.start(MainMenu.Name);
         }, this);
     }
@@ -150,6 +158,7 @@ export default class Lobby extends Phaser.Scene {
         Lobby.challengeGameObjects.clear(true, true);
         gameServer.challengePlayer(player)
         .then((message) => {
+            this.sound.play('select');
             message = `Waiting for ${player.username} (${player.rating})\nto accept your challenge`;
             const text = this.add.text(this.cameras.main.centerX, 450, [message]);
             text.setOrigin(0.5);
@@ -159,6 +168,7 @@ export default class Lobby extends Phaser.Scene {
             declineButton.scale = 0.25;
             declineButton.on("pointerdown", () => {
                 gameServer.respondChallenge('decline', () => {
+                    this.sound.play('back');
                     Lobby.challengeGameObjects.clear(true, true);
                 });
             }, this);
@@ -176,14 +186,22 @@ export default class Lobby extends Phaser.Scene {
         const text = this.add.text(this.cameras.main.centerX, 450, `You have a new challenge from\n${player.username} (${player.rating})`);
         text.setOrigin(0.5);
 
+        this.sound.play('select');
+
         const acceptButton = this.add.image(this.cameras.main.centerX - 50, 520, 'accept_button');
         acceptButton.setInteractive();
         acceptButton.scale = 0.25;
 
         acceptButton.on("pointerdown", () => {
             gameServer.respondChallenge('accept',
-            () => { this.scene.start(Battlefield.Name); },
-            () => { Lobby.challengeGameObjects.clear(true, true); }
+            () => {
+                this.sound.play('confirm');
+                this.scene.start(Battlefield.Name);
+            },
+            () => {
+                this.sound.play('error');
+                Lobby.challengeGameObjects.clear(true, true);
+            }
             );
         }, this);
 
@@ -192,6 +210,7 @@ export default class Lobby extends Phaser.Scene {
         declineButton.scale = 0.25;
         declineButton.on("pointerdown", () => {
             gameServer.respondChallenge('decline', () => {
+                this.sound.play('back');
                 Lobby.challengeGameObjects.clear(true, true);
             });
         }, this);
@@ -200,6 +219,11 @@ export default class Lobby extends Phaser.Scene {
     }
 
     private challengeResponse(data: any): void {
+        if (data.status === 'decline') {
+            this.sound.play('back');
+        } else {
+            this.sound.play('confirm');
+        }
         Lobby.challengeGameObjects.clear(true, true);
     }
 }

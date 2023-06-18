@@ -67,6 +67,7 @@ export default class Login extends Phaser.Scene {
                         element.destroy();
                         backText.destroy();
                         loginText.destroy();
+                        _that.sound.play('teleport');
                         _that.tweens.add({
                             targets: logo,
                             duration: 500,
@@ -78,8 +79,9 @@ export default class Login extends Phaser.Scene {
                         });
                     });
                 } catch (error) {
+                    _that.sound.play('error');
                     console.log(error.message);
-                    this.getChildByID('error').innerText = 'Login failed. Please, try again in a few minutes';
+                    this.getChildByID('error').innerText = error.message;
                 }
             }
         });
@@ -90,7 +92,10 @@ export default class Login extends Phaser.Scene {
             .setOrigin(0.5)
             .setFontFamily("monospace").setFontSize(25).setFill("#fff")
             .setInteractive();
-        backText.on("pointerdown", () => { this.scene.start(MainMenu.Name); }, this);
+        backText.on("pointerdown", () => {
+            this.sound.play('back');
+            this.scene.start(MainMenu.Name);
+        }, this);
     }
 
     public update(): void {
