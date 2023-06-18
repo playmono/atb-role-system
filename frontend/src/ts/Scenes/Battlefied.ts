@@ -6,7 +6,6 @@ import Experience from "../Prefabs/Experience";
 import GameServer from "../Prefabs/GameServer";
 import Trail from "../Prefabs/Trail";
 import Skill from "../Prefabs/Skill";
-import Attack from "../Prefabs/Skills/Attack";
 import { RolesMap, SkillsMap } from "../Prefabs/Constants";
 import Lobby from "./Lobby";
 
@@ -42,7 +41,37 @@ export default class Battlefield extends Phaser.Scene {
         this.trail = new Trail(this, 0x00FFFF, 1);
         this.enemyTrail = new Trail(this, 0xFF0000, 0.5);
 
-        this.configureListeners();
+        gameServer.gameConnection.on('close', () => {
+            this.checkGameOver(true);
+        });
+
+        gameServer.gameConnection.on('data', (data: any) => {
+            console.log('Received on battlefield', data);
+            if (data.type === 'battlefieldLoaded') {
+                this.loadHeros();
+            }
+            if (data.type === 'enemySetup') {
+                this.setEnemySetup(data.data);
+            }
+            if (data.type === 'characterReceivedSkill') {
+                this.characterReceivedSkill(data.data);
+            }
+            if (data.type === 'enemyStatus') {
+                this.enemyStatusChanged(data.data);
+            }
+        });
+
+        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+            this.trail.createPoints(dragX, dragY);
+        });
+
+        this.input.on('dragend',  (pointer, gameObject, dragX, dragY) => {
+            gameObject.x = gameObject.__initialX;
+            gameObject.y = gameObject.__initialY;
+            this.trail.stopTrail();
+        });
 
         // Enemy Info
         this.add.text(
@@ -76,18 +105,6 @@ export default class Battlefield extends Phaser.Scene {
 
         Battlefield.experience = new Experience(experienceField);
         Battlefield.experience.render(this);
-
-        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-            this.trail.createPoints(dragX, dragY);
-        });
-
-        this.input.on('dragend',  (pointer, gameObject, dragX, dragY) => {
-            gameObject.x = gameObject.__initialX;
-            gameObject.y = gameObject.__initialY;
-            this.trail.stopTrail();
-        });
 
         gameServer.gameConnection.send({
             type: 'battlefieldLoaded',
@@ -147,7 +164,6 @@ export default class Battlefield extends Phaser.Scene {
         this.gameIsOver = true;
 
         const gameServer = new GameServer();
-        gameServer.configureListeners();
 
         Battlefield.turnElements.clear(true, true);
         Battlefield.enemyGroup.children.getArray().forEach((gameObject: any) => {
@@ -184,20 +200,23 @@ export default class Battlefield extends Phaser.Scene {
         exitButton.scale = 0.25;
         exitButton.setOrigin(0.5);
 
+        const textError = this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY + 30,
+            '',
+            {fontSize: "16px", color: 'white'}
+        );
+        textError.setOrigin(0.5);
+
         exitButton.on("pointerdown", async() => {
             await gameServer.sendGameResult(
                 gameWon,
                 () => {
+                    textError.destroy();
                     this.endBattlefield();
                 },
                 () => {
-                    const text = this.add.text(
-                        this.cameras.main.centerX,
-                        this.cameras.main.centerY + 30,
-                        'Error. Try again',
-                        {fontSize: "16px", color: 'white'}
-                    );
-                    text.setOrigin(0.5);
+                    textError.setText('Error. Try again');
                 }
             );
         }, this);
@@ -213,30 +232,6 @@ export default class Battlefield extends Phaser.Scene {
                     {fontSize: "14px", color: !gameWon ? 'red' : 'green'}
                 );
                 pointsText.setOrigin(0.5);
-            }
-        });
-    }
-
-    public configureListeners(): void {
-        const gameServer = new GameServer();
-
-        gameServer.gameConnection.on('close', () => {
-            this.checkGameOver(true);
-        });
-
-        gameServer.gameConnection.on('data', (data: any) => {
-            console.log('Received on battlefield', data);
-            if (data.type === 'battlefieldLoaded') {
-                this.loadHeros();
-            }
-            if (data.type === 'enemySetup') {
-                this.setEnemySetup(data.data);
-            }
-            if (data.type === 'characterReceivedSkill') {
-                this.characterReceivedSkill(data.data);
-            }
-            if (data.type === 'enemyStatus') {
-                this.enemyStatusChanged(data.data);
             }
         });
     }
@@ -346,10 +341,10 @@ export default class Battlefield extends Phaser.Scene {
 
     private endBattlefield(): void {
         const gameServer = new GameServer();
-        //gameServer.gameConnection.off('close');
-        //gameServer.gameConnection.off('data');
         gameServer.endGame();
-        this.scene.start(Lobby.Name)
+        this.gameIsOver = false;
+        this.battlefieldIsReady = false;
+        this.scene.start(Lobby.Name);
     }
 
     private loadSfx(): void {

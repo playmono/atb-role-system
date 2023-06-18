@@ -10,6 +10,7 @@ export default class Lobby extends Phaser.Scene {
     public static Name = "Lobby";
     static playerNamesList: Phaser.GameObjects.Group;
     static challengeGameObjects: Phaser.GameObjects.Group;
+    listenersSetup: boolean = false;
 
     public preload(): void {
         this.load.html('login', 'assets/html/login.html');
@@ -21,9 +22,35 @@ export default class Lobby extends Phaser.Scene {
 
         this.renderPlayerList();
 
+        if (!this.listenersSetup) {
+            this.setupListeners();
+        }
+
+        const startYPosition = this.cameras.main.height / 4;
+		const fontSize = 25;
+
+        // Add a button to return to the main menu.
+        const backText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 50, "Go Back");
+        backText
+            .setOrigin(0.5)
+            .setFontFamily("monospace").setFontSize(fontSize).setFill("#fff")
+            .setInteractive();
+        backText.on("pointerdown", () => {
+            const gameServer = new GameServer();
+            gameServer.closeConnection();
+            this.scene.start(MainMenu.Name);
+        }, this);
+    }
+
+    private setupListeners(): void {
+        this.listenersSetup = true;
         const gameServer = new GameServer();
 
         gameServer.peer.socket.on('message', (message) => {
+            console.log('Received message from server', message);
+            if (!this.scene.isActive(this)) {
+                return;
+            }
             if (message.type === 'gameConnect') {
                 this.renderPlayerList();
             }
@@ -45,7 +72,6 @@ export default class Lobby extends Phaser.Scene {
             conn.on('data', (data: any) => {
                 console.log("Received on lobby", data);
                 if (data.type === 'startGame') {
-                    gameServer.peer.socket.off('message');
                     this.scene.start(Battlefield.Name);
                 }
                 if (data.type === "battlefieldLoaded") {
@@ -54,20 +80,6 @@ export default class Lobby extends Phaser.Scene {
                 }
             });
         });
-
-        const startYPosition = this.cameras.main.height / 4;
-		const fontSize = 25;
-
-        // Add a button to return to the main menu.
-		const backText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 50, "Go Back");
-		backText
-			.setOrigin(0.5)
-			.setFontFamily("monospace").setFontSize(fontSize).setFill("#fff")
-			.setInteractive();
-		backText.on("pointerdown", () => {
-            gameServer.closeConnection();
-            this.scene.start(MainMenu.Name);
-        }, this);
     }
 
     private renderPlayerList() {
@@ -169,10 +181,10 @@ export default class Lobby extends Phaser.Scene {
         acceptButton.scale = 0.25;
 
         acceptButton.on("pointerdown", () => {
-            gameServer.respondChallenge('accept', () => {
-                gameServer.unconfigureListeners();
-                this.scene.start(Battlefield.Name);
-            });
+            gameServer.respondChallenge('accept',
+            () => { this.scene.start(Battlefield.Name); },
+            () => { Lobby.challengeGameObjects.clear(true, true); }
+            );
         }, this);
 
         const declineButton = this.add.image(this.cameras.main.centerX + 50, 520, 'decline_button');

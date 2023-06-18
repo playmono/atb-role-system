@@ -24,17 +24,10 @@ export default class GameServer {
             path: '/peerjs',
             token: auth_token,
             secure: process.env.APP_PROTOCOL === 'https',
-            //debug: 3
+            debug: 3
         });
 
-        this.configureListeners();
-
-        GameServer.instance = this;
-    }
-
-    public configureListeners(): void {
         this.peer.socket.on('message', (message) => {
-            console.log('message captured in gameServer:configureListeners:message', message);
             if (message.type === 'gameConnect') {
                 this.addToPlayerList(message.data);
             }
@@ -42,7 +35,9 @@ export default class GameServer {
                 this.removeFromPlayerList(message.data);
             }
             if (message.type === 'challengeOffer') {
-                this.challengeId = message.data.challengeId
+                if (!this.game) {
+                    this.challengeId = message.data.challengeId;
+                }
             }
             if (message.type === 'playerUpdate') {
                 this.updatePlayerList(message.data.players);
@@ -52,17 +47,17 @@ export default class GameServer {
             }
         });
 
+        // Emitted when a new data connection is established from a remote peer. 
         this.peer.on('connection', (conn) => {
             conn.on('open', () => {
-                console.log('message captured in gameServer:configureListeners:open');
                 this.gameConnection = conn;
             });
+            conn.on('close', () => {
+                this.gameConnection = null;
+            });
         });
-    }
 
-    public unconfigureListeners(): void {
-        this.peer.socket.off('message');
-        this.peer.off('connection');
+        GameServer.instance = this;
     }
 
     public async setPlayer(): Promise<void> {
@@ -144,7 +139,7 @@ export default class GameServer {
         });
     }
 
-    public async respondChallenge(status: string, callback?: Function): Promise<void> {
+    public async respondChallenge(status: string, onSuccess?: Function, onFailure?: Function): Promise<void> {
         const url = process.env.APP_PROTOCOL + '://' + process.env.APP_URL + ':' + process.env.APP_PORT;
         const response = await fetch(`${url}/challenge/${this.challengeId}`, {
             method: "PUT",
@@ -155,23 +150,26 @@ export default class GameServer {
             body: JSON.stringify({status: status})
         });
         const responseData = await response.json();
+        if (response.status !== 200) {
+            onFailure();
+        }
         if (responseData.data.status === 'accept') {
             this.game = responseData.data.game;
             const conn = this.peer.connect(this.getOppositeGamePlayer().peerId);
             conn.once('open', () => {
-                console.log('message captured in gameServer:respondChallenge:open');
+                console.log('Opening connection');
                 this.gameConnection = conn;
                 conn.send({type: 'startGame'});
-                callback();
+                onSuccess();
             });
-            conn.on("error", (err) => {
-                console.log(err);
-            });
-            conn.on('close', () => {
-                //endCall()
+            conn.once('close', () => {
+                console.log('Clossing connection');
+                if (this.gameConnection) {
+                    this.gameConnection = null;
+                }
             });
         } else {
-            callback();
+            onSuccess();
         }
     }
 
@@ -214,7 +212,9 @@ export default class GameServer {
 
     public endGame(): void {
         this.game = null;
-        this.gameConnection.close();
+        if (this.gameConnection) {
+            this.gameConnection.close();
+        }
         this.setPlayer();
     }
 }

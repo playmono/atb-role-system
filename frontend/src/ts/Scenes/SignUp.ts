@@ -12,10 +12,16 @@ export default class SignUp extends Phaser.Scene {
 
     public create(): void {
         Utilities.LogSceneMethodEntry("SignUp", "create");
-        const startYPosition = this.cameras.main.height / 4;
-        const fontSize = 25;
 
-        const element = this.add.dom(this.cameras.main.centerX, startYPosition).createFromCache('login');
+        const signupText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 4, "Sign Up");
+        signupText
+            .setFontFamily("monospace")
+            .setFontSize(40)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5);
+
+        const element = this.add.dom(this.cameras.main.centerX, this.cameras.main.centerY).createFromCache('login');
         element.addListener('click');
         element.on('click', async function (event) {
             if (event.target.name === 'button') {
@@ -47,10 +53,10 @@ export default class SignUp extends Phaser.Scene {
         });
 
         // Add a button to return to the main menu.
-        const backText = this.add.text(this.cameras.main.centerX, startYPosition * 2 + 100, "Go Back");
+        const backText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 50, "Go Back");
         backText
             .setOrigin(0.5)
-            .setFontFamily("monospace").setFontSize(fontSize).setFill("#fff")
+            .setFontFamily("monospace").setFontSize(25).setFill("#fff")
             .setInteractive();
         backText.on("pointerdown", () => { this.scene.start(MainMenu.Name); }, this);
     }

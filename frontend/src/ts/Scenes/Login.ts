@@ -15,10 +15,16 @@ export default class Login extends Phaser.Scene {
 
     public create(): void {
         Utilities.LogSceneMethodEntry("Login", "create");
-		const startYPosition = this.cameras.main.height / 4;
-		const fontSize = 25;
 
-        const element = this.add.dom(this.cameras.main.centerX, startYPosition).createFromCache('login');
+        const loginText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 4, "Login");
+        loginText
+            .setFontFamily("monospace")
+            .setFontSize(40)
+            .setFill("#fff")
+            .setAlign("center")
+            .setOrigin(0.5);
+
+        const element = this.add.dom(this.cameras.main.centerX, this.cameras.main.centerY).createFromCache('login');
         const button = element.getChildByName('button');
         button.setAttribute('value', 'Login');
 
@@ -55,13 +61,13 @@ export default class Login extends Phaser.Scene {
             }
         });
 
-		// Add a button to return to the main menu.
-		const backText = this.add.text(this.cameras.main.centerX, startYPosition * 2 + 100, "Go Back");
-		backText
-			.setOrigin(0.5)
-			.setFontFamily("monospace").setFontSize(fontSize).setFill("#fff")
-			.setInteractive();
-		backText.on("pointerdown", () => { this.scene.start(MainMenu.Name); }, this);
+        // Add a button to return to the main menu.
+        const backText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 50, "Go Back");
+        backText
+            .setOrigin(0.5)
+            .setFontFamily("monospace").setFontSize(25).setFill("#fff")
+            .setInteractive();
+        backText.on("pointerdown", () => { this.scene.start(MainMenu.Name); }, this);
     }
 
     public update(): void {

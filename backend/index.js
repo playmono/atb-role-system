@@ -46,7 +46,6 @@ app.post("/sign-up", async (req, res) => {
             res.send(player);
         })
         .catch ((error) => {
-            console.log(error);
             return sendError(res, error);
         });
 });
@@ -100,7 +99,6 @@ app.post("/login", (req, res) => {
             res.status(200).send(JSON.stringify({auth_token: token}));
         })
         .catch ((error) => {
-            console.log(error);
             return sendError(res, error);
         });
 });
@@ -229,6 +227,15 @@ app.put("/games/:gameId", authenticateToken, (req, res) => {
                         players: [playerToUpdate]
                     }
                 });
+
+                let found = false;
+                users.forEach((user, key) => {
+                    if (user.player.id === gamePlayer.player.id) {
+                        found = user;
+                        return;
+                    }
+                });
+                found.player = gamePlayer.player;
             }
 
             return res.sendStatus(200);
@@ -239,6 +246,7 @@ app.put("/games/:gameId", authenticateToken, (req, res) => {
 });
 
 function sendError(res, error) {
+    console.log(error);
     let errorCode = 500;
     let errorMessage = error.message;
     switch (error.code) {
@@ -344,7 +352,11 @@ function authenticateToken(req, res, callback) {
         if (error) return res.sendStatus(403);
         const player = await database.findPlayerById(decoded.id);
         const user = getUserByPlayerId(player.id);
-        if (!user) return res.sendStatus(500);
+        if (!user) {
+            // Here we could search by active games, then retrieve gamePlayers and if player.id matches with id inside the token
+            // then retrieve peerId and build user object.
+            return res.sendStatus(500);
+        }
         req.user = user;
         callback();
     });
