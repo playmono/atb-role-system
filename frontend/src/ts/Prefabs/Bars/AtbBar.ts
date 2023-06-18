@@ -14,7 +14,7 @@ export default class AtbBar extends CharacterBar {
         this.progressBox = this.character.sprite.scene.add.graphics();
 
         const oneThirdY = this.character.sprite.scene.cameras.main.width / 3;
-        const offsetY = this.character.row === Rows.BELOW_ROW ? 30 : 60;
+        const offsetY = this.character.row === Rows.BELOW_ROW ? 15 : 60;
 
         this.x = this.character.sprite.getBottomCenter().x - CharacterBar.width / 2;
         this.y = oneThirdY * (this.character.row * 3 + 1) + offsetY;

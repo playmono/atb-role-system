@@ -100,7 +100,7 @@ export default abstract class Character {
         const oneThirdY = scene.cameras.main.width / 3;
         const oneQuarterX = scene.cameras.main.width / 6;
 
-        const offsetY = this.row === Rows.BELOW_ROW ? -30 : 0;
+        const offsetY = this.row === Rows.BELOW_ROW ? -50 : 0;
 
         this.sprite.x = oneQuarterX * (this.column * 2 + 1);
         this.sprite.y = oneThirdY * (this.row * 3 + 1) + offsetY + this.currentRoleType.spriteOffsetY;

@@ -8,6 +8,7 @@ import Trail from "../Prefabs/Trail";
 import Skill from "../Prefabs/Skill";
 import { RolesMap, SkillsMap } from "../Prefabs/Constants";
 import Lobby from "./Lobby";
+import MainSettings from "./MainSettings";
 
 export default class Battlefield extends Phaser.Scene {
     static Name = "Battlefield";
@@ -43,6 +44,11 @@ export default class Battlefield extends Phaser.Scene {
 
         this.sound.stopAll();
         this.sound.play('battle');
+
+        if (MainSettings.Background) {
+            const texture = MainSettings.Background.texture.key.replace('-mini', '');
+            const bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, texture);
+        }
 
         gameServer.gameConnection.on('close', () => {
             this.checkGameOver(true);
@@ -100,9 +106,9 @@ export default class Battlefield extends Phaser.Scene {
 
         const experienceField = new Phaser.Geom.Rectangle(
             20,
-            this.cameras.main.centerY - 100,
+            this.cameras.main.centerY - 80,
             this.cameras.main.width - 50,
-            100
+            50
         );
         //this.add.graphics({ lineStyle: { color: 0x00ff00 } }).strokeRectShape(experienceField);
 

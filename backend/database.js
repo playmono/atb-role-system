@@ -17,6 +17,10 @@ const database = {
 
     savePlayer: function(player) {
         return new Promise((resolve, reject) => {
+            if (!player.password) {
+                reject('Password cannot be null');
+                return;
+            }
             const db = new sqlite3.Database(DB_NAME);
             db.run('REPLACE INTO player VALUES (?, ?, ?, ?, ?)', [
                 player.id,

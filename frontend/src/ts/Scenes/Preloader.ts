@@ -135,6 +135,16 @@ export default class Preloader extends Phaser.Scene {
     }
 
     private loadVfx(): void {
+        this.load.image('switch_on', 'vfx/switch_on.png');
+        this.load.image('switch_off', 'vfx/switch_off.png');
+        this.load.image('background1-mini', 'vfx/backgrounds/background1-mini.png');
+        this.load.image('background2-mini', 'vfx/backgrounds/background2-mini.png');
+        this.load.image('background3-mini', 'vfx/backgrounds/background3-mini.png');
+        this.load.image('background4-mini', 'vfx/backgrounds/background4-mini.png');
+        this.load.image('background1', 'vfx/backgrounds/background1.png');
+        this.load.image('background2', 'vfx/backgrounds/background2.png');
+        this.load.image('background3', 'vfx/backgrounds/background3.png');
+        this.load.image('background4', 'vfx/backgrounds/background4.png');
         this.load.image('play_button_enabled', 'vfx/play_button_enabled.png');
         this.load.image('play_button_disabled', 'vfx/play_button_disabled.png');
         this.load.image('experience_icon', 'vfx/experience.png');
