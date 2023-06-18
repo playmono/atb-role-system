@@ -174,6 +174,7 @@ const database = {
     },
 
     create: function() {
+        console.log('Database path', DB_NAME);
         if (fileSystem.existsSync(DB_NAME)) {
             return;
         }
