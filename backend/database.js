@@ -18,26 +18,15 @@ const database = {
     savePlayer: function(player) {
         return new Promise((resolve, reject) => {
             const db = new sqlite3.Database(DB_NAME);
-            if (player.password) {
-                db.run('REPLACE INTO player VALUES (?, ?, ?, ?, ?)', [
-                    player.id,
-                    player.username,
-                    player.password,
-                    player.rating,
-                    player.createdAt
-                ], (error) => {
-                    error? reject(error) : resolve(player);
-                });
-            } else {
-                db.run('REPLACE INTO player VALUES (?, ?, ?, ?)', [
-                    player.id,
-                    player.username,
-                    player.rating,
-                    player.createdAt
-                ], (error) => {
-                    error? reject(error) : resolve(player);
-                });
-            }
+            db.run('REPLACE INTO player VALUES (?, ?, ?, ?, ?)', [
+                player.id,
+                player.username,
+                player.password,
+                player.rating,
+                player.createdAt
+            ], (error) => {
+                error? reject(error) : resolve(player);
+            });
             db.close();
         });
     },
