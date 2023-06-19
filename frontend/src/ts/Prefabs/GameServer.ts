@@ -216,6 +216,7 @@ export default class GameServer {
     }
 
     public endGame(): void {
+        this.challengeId = null;
         this.game = null;
         if (this.gameConnection) {
             this.gameConnection.close();

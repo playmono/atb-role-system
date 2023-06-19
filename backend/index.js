@@ -168,14 +168,18 @@ app.put("/challenge/:challengeId", authenticateToken, (req, res) => {
         return sendError(res, {code: 403, message: 'Anoter player cannot accept the challenge'});
     }
 
-    const data = updateChallenge(req.params.challengeId, challenge, req.body.status);
-
-    res.status(200).send({
-        data: {
-            status: data.data.status,
-            game: data.data.game
-        }
-    });
+    updateChallenge(req.params.challengeId, challenge, req.body.status)
+        .then((data) => {
+            res.status(200).send({
+                data: {
+                    status: data.data.status,
+                    game: data.data.game
+                }
+            });
+        })
+        .catch((error) => {
+            sendError(res, error);
+        });
 });
 
 app.get("/active-players", authenticateToken, (req, res) => {
@@ -212,6 +216,14 @@ app.put("/games/:gameId", authenticateToken, (req, res) => {
             });
             savedGame = game;
             return database.save(game);
+        })
+        .then(() => {
+            let promises = [];
+            savedGame.gamePlayers.forEach((gamePlayer) => {
+                promises.push(database.saveGamePlayer(gamePlayer));
+                promises.push(database.savePlayer(gamePlayer.player));
+            });
+            return Promise.all(promises);
         })
         .then(() => {
             const gamePlayer = savedGame.gamePlayers.find((gamePlayer) => gamePlayer.player.id === req.body.from);
@@ -388,7 +400,7 @@ function sendToAllClients(data) {
     }
 }
 
-function updateChallenge(challengeId, challenge, status) {
+async function updateChallenge(challengeId, challenge, status) {
     if (status === 'accept') {
         challenge.to.player.status = 'ingame';
         challenge.from.player.status = 'ingame';
@@ -410,10 +422,12 @@ function updateChallenge(challengeId, challenge, status) {
             player: challenge.from.player,
             peerId: challenge.from.client.id
         });
-        database.save(game);
-
-        // quick fix to avoid circular reference
-        game.gamePlayers.forEach((gamePlayer) => {
+        await database.save(game);
+        game.gamePlayers.forEach(async (gamePlayer) => {
+            await database.saveGamePlayer(gamePlayer);
+        });
+         // quick fix to avoid circular reference
+         game.gamePlayers.forEach((gamePlayer) => {
             delete(gamePlayer.game);
         });
     }

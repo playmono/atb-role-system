@@ -37,7 +37,7 @@ const database = {
 
     saveGame: function(game) {
         const promises =  [];
-        let promiseQuery = new Promise ((resolve, reject) => {
+        return new Promise ((resolve, reject) => {
             const db = new sqlite3.Database(DB_NAME);
             db.run('REPLACE INTO game VALUES (?, ?, ?)', [
                 game.id,
@@ -48,25 +48,21 @@ const database = {
             });
             db.close();
         });
-        promises.push(promiseQuery);
-        game.gamePlayers.forEach((gamePlayer) => {
-            promiseQuery = new Promise((resolve, reject) => {
-                const db = new sqlite3.Database(DB_NAME);
-                db.run('REPLACE INTO game_player VALUES (?, ?, ?, ?)', [
-                    gamePlayer.game.id,
-                    gamePlayer.player.id,
-                    gamePlayer.peerId,
-                    gamePlayer.result
-                ], (error) => {
-                    error? reject(error) : resolve(gamePlayer);
-                });
-                db.close();
-            });
-            promises.push(promiseQuery);
-            promises.push(this.savePlayer(gamePlayer.player));
-        });
+    },
 
-        return Promise.all(promises);
+    saveGamePlayer: function(gamePlayer) {
+        return new Promise((resolve, reject) => {
+            const db = new sqlite3.Database(DB_NAME);
+            db.run('REPLACE INTO game_player VALUES (?, ?, ?, ?)', [
+                gamePlayer.game.id,
+                gamePlayer.player.id,
+                gamePlayer.peerId,
+                gamePlayer.result
+            ], (error) => {
+                error? reject(error) : resolve(gamePlayer);
+            });
+            db.close();
+        });
     },
 
     findPlayerByUsername: function(username) {
