@@ -43,7 +43,7 @@ export default class Battlefield extends Phaser.Scene {
         this.enemyTrail = new Trail(this, 0xFF0000, 0.5);
 
         this.sound.stopAll();
-        this.sound.play('battle');
+        this.sound.play('battle', {loop: true, volume: 0.8});
 
         if (MainSettings.Background) {
             const texture = MainSettings.Background.texture.key.replace('-mini', '');

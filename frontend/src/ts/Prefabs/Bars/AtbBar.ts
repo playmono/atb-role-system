@@ -42,7 +42,7 @@ export default class AtbBar extends CharacterBar {
         this.bar.fillRect(this.x, this.y + this.offsetY, this.currentWidth, CharacterBar.height);
         this.currentWidth++;
 
-        this.character.sprite.scene.time.delayedCall(1, this.updateProgressBar, [], this);
+        this.character.sprite.scene.time.delayedCall(200, this.updateProgressBar, [], this);
     }
 
     stop() {

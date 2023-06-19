@@ -16,7 +16,7 @@ export default class Skill {
     static readonly effectRange: EffectRange;
     static readonly damageType: DamageType;
     static readonly areaOfEffect: AreaOfEffect;
-    static readonly damage: number = -100;
+    static readonly damage: number = -20;
     static readonly soundEffect: string = 'spell';
 
     static readonly skills: [number, typeof Skill][];
