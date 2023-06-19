@@ -45,6 +45,7 @@ export default class Lobby extends Phaser.Scene {
         backText.on("pointerdown", () => {
             const gameServer = new GameServer();
             gameServer.closeConnection();
+            this.listenersSetup = false;
             this.sound.play('back');
             this.scene.start(MainMenu.Name);
         }, this);
