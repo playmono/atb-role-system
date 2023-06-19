@@ -7,12 +7,14 @@ This game has two parts: the game itself and the server. In order to run the ful
 2. Run the backend (AKA the server)
 ```bash
 cd backend
+cp .env.dist .env
 npm install
 npm run start
 ```
 3. Run the frontend (AKA the game)
 ```bash
 cd frontend
+cp .env.dist .env
 npm install
 npm run start:dev
 # Run `npm run` to check all the commands
