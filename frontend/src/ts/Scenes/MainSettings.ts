@@ -39,7 +39,10 @@ export default class MainSettings extends Phaser.Scene {
 
         musicPlayButton.on("pointerdown", () => {
             this.sound.mute = !this.sound.mute;
-            musicPlayButton.setTexture(this.sound.mute ? 'play_button_disabled' : 'play_button_enabled');
+            // we need to wait at least to 50ms because some sort of a bug
+            setTimeout(() => {
+                musicPlayButton.setTexture(this.sound.mute ? 'play_button_disabled' : 'play_button_enabled');
+            }, 50);
         }, this);
 
         /*
