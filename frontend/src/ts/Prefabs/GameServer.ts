@@ -176,12 +176,15 @@ export default class GameServer {
     }
 
     public challengeResponse(data: any): void {
-        if (this.challengeId !== data.game.id) {
-            console.error('error. challenge id different');
-            return;
+        if (data.status === 'accept') {
+            if (this.challengeId !== data.game.id) {
+                console.error('error. challenge id different');
+                return;
+            }
+            this.game = data.game;
+        } else {
+            this.challengeId = null;
         }
-        this.game = data.game;
-        this.challengeId = null;
     }
 
     public getOppositeGamePlayer() {
